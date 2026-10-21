@@ -6,7 +6,7 @@
 
 **Architecture:** Next.js (App Router, Server & Client Components, Route Handlers / Server Actions) dengan `@supabase/ssr` untuk autentikasi aman berbasis sesi. Basis data PostgreSQL Supabase dengan Row Level Security (RLS) untuk isolasi cabang, Stored Procedures/RPC untuk transaksi *checkout* atomik dan penomoran struk anti-*race condition*, serta proteksi harga modal via RLS dan Security Definer RPC. UI responsif tablet 10" ($\ge 1024$px) dibangun dengan Tailwind CSS v3.4 dan siap di-deploy ke Netlify (*internal app with noindex*).
 
-**Tech Stack:** Next.js 14/15 (App Router), React, TypeScript, Tailwind CSS v3.4, `@supabase/ssr`, `@supabase/supabase-js`, Vitest / Playwright, Netlify.
+**Tech Stack:** Next.js 14/15 (App Router), React, TypeScript, Tailwind CSS v3.4, **shadcn/ui** (preset: `b1tgXpkWI`, base: `radix`, template: `next`), `@supabase/ssr`, `@supabase/supabase-js`, Vitest / Playwright, Netlify.
 
 **Spec:** [docs/superpowers/specs/2026-10-21-lumbung-multipos-design.md](file:///c:/Users/LENOVO/Bootcamp-FutureMakers/lumbung-multi-pos/docs/superpowers/specs/2026-10-21-lumbung-multipos-design.md)
 
@@ -93,30 +93,34 @@ lumbung-multi-pos/
 
 ## Tasks
 
-### Task 1: Project Scaffolding, TypeScript, Tailwind CSS v3.4, and Testing Setup
+### Task 1: Project Scaffolding, TypeScript, Tailwind CSS v3.4, shadcn/ui, and Testing Setup
 
 **Files:**
-- Create: `package.json`, `tsconfig.json`, `tailwind.config.ts`, `postcss.config.js`, `netlify.toml`
+- Create: `package.json`, `tsconfig.json`, `tailwind.config.ts`, `postcss.config.js`, `netlify.toml`, `components.json`
 - Create: `src/app/layout.tsx`, `src/app/page.tsx`, `src/app/globals.css`
-- Create: `src/components/ui/button.tsx`, `src/components/ui/card.tsx`, `src/components/ui/badge.tsx`
+- Create: `src/components/ui/` (shadcn primitives: button, card, badge, dialog, input, table, tabs, dropdown-menu)
 - Create: `vitest.config.ts`, `tests/unit/setup.test.ts`
 
 **Interfaces:**
-- Produces: Base Next.js app with Tailwind v3.4 design tokens (colors, typography, tablet breakpoint layout), shared UI primitives, and Vitest test runner.
+- Produces: Base Next.js app with Tailwind v3.4 design tokens, shadcn/ui components (Radix base, preset `b1tgXpkWI`), shared UI primitives, and Vitest test runner.
 
 - [ ] **Step 1: Inisialisasi package.json dan instalasi dependencies**
   - Next.js 14+, React 18/19, TypeScript, Tailwind CSS v3.4, `@supabase/ssr`, `@supabase/supabase-js`, Lucide React icons, Vitest, `@testing-library/react`.
-- [ ] **Step 2: Konfigurasi Tailwind CSS v3.4 dan PostCSS**
-  - `tailwind.config.ts`: konfigurasikan tema kedai kopi/roti (warna earthy amber, warm stone, espresso dark), serta breakpoint tablet `min-w-[1024px]`.
-- [ ] **Step 3: Konfigurasi Netlify and Robots Noindex**
+- [ ] **Step 2: Inisialisasi shadcn/ui menggunakan preset**
+  - Jalankan: `npx shadcn@latest init --preset b1tgXpkWI --base radix --template next`
+  - Verifikasi `components.json` terbuat dan terkonfigurasi dengan benar.
+- [ ] **Step 3: Konfigurasi Tailwind CSS v3.4, tema Lumbung, dan PostCSS**
+  - `tailwind.config.ts`: sesuaikan tema Lumbung Kopi dan Roti (palet earthy amber, warm stone, espresso dark), serta breakpoint tablet `min-w-[1024px]`.
+  - Pasang komponen UI dasar: `npx shadcn@latest add button card badge dialog input table tabs dropdown-menu`
+- [ ] **Step 4: Konfigurasi Netlify and Robots Noindex**
   - Buat `netlify.toml` dengan Next.js plugin dan custom headers `X-Robots-Tag: noindex, nofollow`.
-- [ ] **Step 4: Buat Unit Test Sederhana Vitest**
+- [ ] **Step 5: Buat Unit Test Sederhana Vitest**
   - `tests/unit/setup.test.ts`: Uji bahwa environment test berjalan normal.
   - Jalankan `npm test` untuk memverifikasi.
-- [ ] **Step 5: Commit**
+- [ ] **Step 6: Commit**
   ```bash
   git add .
-  git commit -m "chore: scaffold Next.js App Router with Tailwind CSS v3.4 and Vitest"
+  git commit -m "chore: scaffold Next.js App Router with Tailwind CSS v3.4, shadcn preset, and Vitest"
   ```
 
 ---
