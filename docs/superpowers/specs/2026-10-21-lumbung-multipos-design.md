@@ -20,17 +20,19 @@ Lumbung MultiPOS adalah sistem kasir (Point of Sale) multi-cabang berbasis web y
 ## 2. Arsitektur Sistem & Tumpukan Teknologi (Tech Stack)
 
 ### 2.1 Komponen Sistem
-- **Frontend**: Single Page Application (SPA) modern yang cepat (< 2 detik waktu muat, < 1 detik penyimpanan transaksi) dan ramah tablet 10" (resolusi $\ge 1024$px).
-  - Framework: Vite + Web Component / Modern Modular JavaScript + Vanilla CSS Design System.
+- **Frontend & Framework**: Next.js (App Router, React, TypeScript, Tailwind CSS).
+  - Desain antarmuka responsif optimal untuk tablet 10" (resolusi $\ge 1024$px) serta desktop.
+  - Performa cepat (< 2 detik waktu muat halaman, < 1 detik penyimpanan transaksi pada koneksi normal).
   - Cetak Struk: Integrasi thermal printer 58mm via browser print API dan ekspor format PDF.
 - **Backend & Database (BaaS)**: Supabase (PostgreSQL 15+).
-  - **Supabase Auth**: Autentikasi berbasis token JWT, integrasi profil staf.
-  - **Row Level Security (RLS)**: Isolasi ketat data cabang dan restriksi peran.
-  - **Stored Procedures / RPC**: Menangani transaksi atomik (*checkout*), penomoran struk sekuensial tahan balapan (*race condition*), dan eksekusi *void*.
-  - **Security Definer Views**: Menjaga kerahasiaan `cost_price` dan laba dari akun non-Owner.
+  - **Supabase Auth & SSR**: Menggunakan `@supabase/ssr` untuk autentikasi yang aman di Server Components, Middleware, dan Client Components.
+  - **Row Level Security (RLS)**: Penegakan isolasi ketat data cabang dan restriksi peran langsung di basis data.
+  - **Integritas Data & Concurrency**: Stored Procedures / RPC PostgreSQL untuk eksekusi transaksi atomik (*checkout* pesanan & pemotongan stok), penomoran struk sekuensial tahan balapan (*race condition*), serta eksekusi *void*.
+  - **Security Definer Views / RPC**: Menjaga kerahasiaan `cost_price` dan laba dari akun non-Owner (data laba/modal tidak dikirim ke browser Kepala Toko/Kasir).
 - **Hosting & Lingkungan**:
-  - Netlify dengan header `X-Robots-Tag: noindex, nofollow` dan file `robots.txt` disetel tertutup (aplikasi internal).
-  - Serverless function untuk integrasi webhook opsional (Mayar API V2 sandbox).
+  - **Netlify**: Deployment Next.js (Netlify Next.js Runtime).
+  - Pengaturan keamanan internal: Header `X-Robots-Tag: noindex, nofollow` dan `robots.txt` disetel tertutup (aplikasi internal).
+  - Lingkungan variabel aman (kunci `service_role` dan kredensial sensitif hanya berada di server/Netlify environment).
 
 ---
 
@@ -178,7 +180,7 @@ Lumbung MultiPOS adalah sistem kasir (Point of Sale) multi-cabang berbasis web y
 
 ## 7. Rencana Penahapan Eksekusi (Implementation Milestones)
 
-- **Milestone 1**: Inisialisasi Proyek & Desain Sistem UI (Vite + Vanilla CSS tokens, layout responsif tablet 10").
+- **Milestone 1**: Inisialisasi Proyek Next.js App Router, TypeScript, Tailwind CSS, & Fondasi Komponen Desain Responsif (Tablet 10" $\ge 1024$px).
 - **Milestone 2**: Desain Skema Database Supabase, Migrasi RLS, Stored Procedures (`process_checkout`, invoice counter, void).
 - **Milestone 3**: Autentikasi Pengguna & Penanganan Shift Kasir (`/login`, `/shift-saya`).
 - **Milestone 4**: Modul Kasir / POS & Cetak Struk 58mm/PDF (`/kasir`, BR-02 s.d. BR-07).
