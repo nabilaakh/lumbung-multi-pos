@@ -104,20 +104,20 @@ lumbung-multi-pos/
 **Interfaces:**
 - Produces: Base Next.js app with Tailwind v3.4 design tokens, shadcn/ui components (Radix base, preset `b1tgXpkWI`), shared UI primitives, and Vitest test runner.
 
-- [ ] **Step 1: Inisialisasi package.json dan instalasi dependencies**
+- [x] **Step 1: Inisialisasi package.json dan instalasi dependencies**
   - Next.js 14+, React 18/19, TypeScript, Tailwind CSS v3.4, `@supabase/ssr`, `@supabase/supabase-js`, Lucide React icons, Vitest, `@testing-library/react`.
-- [ ] **Step 2: Inisialisasi shadcn/ui menggunakan preset**
+- [x] **Step 2: Inisialisasi shadcn/ui menggunakan preset**
   - Jalankan: `npx shadcn@latest init --preset b1tgXpkWI --base radix --template next`
   - Verifikasi `components.json` terbuat dan terkonfigurasi dengan benar.
-- [ ] **Step 3: Konfigurasi Tailwind CSS v3.4, tema Lumbung, dan PostCSS**
+- [x] **Step 3: Konfigurasi Tailwind CSS v3.4, tema Lumbung, dan PostCSS**
   - `tailwind.config.ts`: sesuaikan tema Lumbung Kopi dan Roti (palet earthy amber, warm stone, espresso dark), serta breakpoint tablet `min-w-[1024px]`.
   - Pasang komponen UI dasar: `npx shadcn@latest add button card badge dialog input table tabs dropdown-menu`
-- [ ] **Step 4: Konfigurasi Netlify and Robots Noindex**
+- [x] **Step 4: Konfigurasi Netlify and Robots Noindex**
   - Buat `netlify.toml` dengan Next.js plugin dan custom headers `X-Robots-Tag: noindex, nofollow`.
-- [ ] **Step 5: Buat Unit Test Sederhana Vitest**
+- [x] **Step 5: Buat Unit Test Sederhana Vitest**
   - `tests/unit/setup.test.ts`: Uji bahwa environment test berjalan normal.
   - Jalankan `npm test` untuk memverifikasi.
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
   ```bash
   git add .
   git commit -m "chore: scaffold Next.js App Router with Tailwind CSS v3.4, shadcn preset, and Vitest"
