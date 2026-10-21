@@ -134,26 +134,30 @@ lumbung-multi-pos/
 - Create: `tests/unit/schema-types.test.ts`
 
 **Interfaces:**
-- Produces: 10 tabel utama (`branches`, `profiles`, `products`, `cost_price_history`, `branch_stock`, `cashier_shifts`, `daily_invoice_counters`, `transactions`, `transaction_items`, `audit_logs`).
-- Produces: RLS Policies penegak isolasi cabang dan kerahasiaan `cost_price` (BR-01, BR-11, BR-12).
+- Produces: 9 tabel utama sesuai ERD (`cabang`, `profiles`, `produk`, `riwayat_harga_modal`, `stok_cabang`, `shift_kasir`, `transaksi`, `transaksi_item`, `audit_log`).
+- Produces: RLS Policies penegak isolasi cabang dan kerahasiaan `riwayat_harga_modal` (BR-01, BR-11, BR-12).
 
-- [ ] **Step 1: Tulis migration tabel utama dan foreign keys**
-  - Tabel `branches` (TBT, BTR, DPK).
-  - Tabel `profiles` (terkait `auth.users`, role: `kasir`, `kepala_toko`, `owner`, status `is_active`).
-  - Tabel `products` & `branch_stock` (check `quantity >= 0`).
-  - Tabel `cost_price_history` (effective_from, rahasia Owner).
-  - Tabel `cashier_shifts`, `daily_invoice_counters`, `transactions`, `transaction_items`, `audit_logs`.
+- [ ] **Step 1: Tulis migration 9 tabel utama, constraint, dan foreign keys**
+  - Tabel `cabang` (TBT, BTR, DPK, urut_struk_tanggal, urut_struk_terakhir).
+  - Tabel `profiles` (terkait `auth.users(id)`, peran: `kasir`, `kepala_toko`, `owner`, status `aktif`, constraint 1 kepala toko aktif per cabang).
+  - Tabel `produk` (kategori: `kopi`, `non_kopi`, `roti`, `snack`, `kemasan`, harga_jual integer, lacak_stok, aktif).
+  - Tabel `riwayat_harga_modal` (produk_id, harga_modal integer, berlaku_mulai, dibuat_oleh, rahasia Owner).
+  - Tabel `stok_cabang` (cabang_id, produk_id, jumlah >= 0, stok_minimum >= 0).
+  - Tabel `shift_kasir` (cabang_id, kasir_id, status: buka/ditutup/diverifikasi, kas_awal 0-2jt, kas_seharusnya, selisih, catatan_tutup, verifikasi).
+  - Tabel `transaksi` (nomor_struk unik, cabang_id, shift_id, kasir_id, subtotal, diskon <= 10%, total, metode_bayar, uang_diterima, kembalian, void data).
+  - Tabel `transaksi_item` (transaksi_id, produk_id, nama_produk, harga_satuan, jumlah 1-99, subtotal).
+  - Tabel `audit_log` (id identity, pelaku_id, aksi, tabel, data_id, nilai_sebelum, nilai_sesudah, dibuat_pada).
 - [ ] **Step 2: Tulis RLS Policies**
-  - `profiles`: user membaca profil sendiri; Owner membaca/mengubah semua.
-  - `branch_stock` & `transactions` & `cashier_shifts`: Kasir & Kepala Toko terisolasi ke `profile.branch_id`. Owner bebas akses.
-  - `cost_price_history`: HANYA Owner yang memiliki izin SELECT / INSERT. Kasir dan Kepala Toko ditolak di tingkat RLS.
-  - `audit_logs`: INSERT diizinkan untuk fungsi/sistem; SELECT untuk Owner; UPDATE/DELETE ditolak total (*immutable*).
+  - `profiles`: user membaca profil sendiri/cabang; Owner membaca/mengubah semua.
+  - `stok_cabang`, `transaksi`, `shift_kasir`: Kasir & Kepala Toko terisolasi ke `cabang_id`. Owner bebas akses.
+  - `riwayat_harga_modal`: HANYA Owner yang memiliki izin SELECT / INSERT. Kasir dan Kepala Toko ditolak total di tingkat RLS.
+  - `audit_log`: INSERT diizinkan untuk fungsi/sistem; SELECT untuk Owner; UPDATE/DELETE ditolak total (*immutable*).
 - [ ] **Step 3: Generate TypeScript types**
-  - Buat `src/types/database.ts` yang mencerminkan tipe tabel Supabase.
+  - Buat `src/types/database.ts` yang mencerminkan 9 tabel Supabase.
 - [ ] **Step 4: Commit**
   ```bash
   git add supabase/ src/types/database.ts
-  git commit -m "feat(db): add initial schema, migrations, and RLS policies"
+  git commit -m "feat(db): add 9 tables schema, migrations, and RLS policies from ERD_POS"
   ```
 
 ---
@@ -235,25 +239,25 @@ lumbung-multi-pos/
 - Create: `tests/integration/atomic-checkout.test.ts`
 
 **Interfaces:**
-- Produces: Postgres function `process_checkout(p_branch_id, p_cashier_id, p_shift_id, p_items, p_discount, p_discount_reason, p_payment_method, p_cash_tendered)`
-- Produces: Struk format `KODE-YYYYMMDD-NNNN` anti-*race condition*.
+- Produces: Postgres function `proses_checkout_transaksi(p_shift_id, p_items, p_diskon, p_alasan_diskon, p_metode_bayar, p_uang_diterima)`
+- Produces: Struk format `KODE-YYYYMMDD-NNNN` anti-*race condition* langsung via tabel `cabang`.
 
 - [ ] **Step 1: Write integration tests for atomic checkout (TC-06, TC-07, TC-08, TC-10, TC-11, TC-12)**
   - Test transaksi ditolak jika kasir tidak memiliki shift `buka`.
   - Test transaksi atomik gagal jika stok produk kurang (tidak ada penjualan parsial).
   - Test simulasi 2 kasir membeli sisa stok 1: 1 sukses, 1 gagal, stok akhir 0.
-  - Test invoice number terbit berurutan `KODE-YYYYMMDD-0001`, `0002`.
-- [ ] **Step 2: Tulis Stored Procedure `process_checkout` di SQL**
-  - Kunci baris shift: pastikan `status = 'buka'`.
-  - Kunci baris stok produk yang dilacak (`SELECT quantity FROM branch_stock WHERE ... FOR UPDATE`).
-  - Validasi: jika stok kurang dari `item.quantity`, lempar exception `'INSUFFICIENT_STOCK'`.
-  - Kurangi stok: `UPDATE branch_stock SET quantity = quantity - item.quantity`.
-  - Ambil dan naikkan invoice counter harian cabang secara atomik (`INSERT ... ON CONFLICT (branch_id, date) DO UPDATE SET last_sequence = last_sequence + 1 RETURNING last_sequence`).
-  - Format nomor invoice: `BRANCH_CODE || '-' || TO_CHAR(NOW(), 'YYYYMMDD') || '-' || LPAD(seq::text, 4, '0')`.
-  - Catat `transactions` dan `transaction_items` (snapshot harga jual dan harga modal saat transaksi).
-  - Update akumulasi `total_cash_sales` / `total_qris_sales` di tabel `cashier_shifts`.
+  - Test nomor struk terbit berurutan `KODE-YYYYMMDD-0001`, `0002`.
+- [ ] **Step 2: Tulis Stored Procedure `proses_checkout_transaksi` di SQL**
+  - Kunci baris shift: pastikan `status = 'buka'` (BR-02).
+  - Kunci baris `cabang` (`FOR UPDATE`) untuk nomor urut harian: jika tanggal baru (WIB), reset `urut_struk_terakhir = 1`, jika sama increment + 1 (BR-04).
+  - Format nomor struk: `kode || '-' || TO_CHAR(WIB_DATE, 'YYYYMMDD') || '-' || LPAD(urut::text, 4, '0')`.
+  - Kunci baris stok produk yang dilacak (`SELECT jumlah FROM stok_cabang WHERE ... FOR UPDATE`).
+  - Validasi: jika stok kurang dari `item.jumlah`, lempar exception `'Stok tidak mencukupi'`.
+  - Kurangi stok: `UPDATE stok_cabang SET jumlah = jumlah - item.jumlah`.
+  - Catat `transaksi` dan `transaksi_item` (katalog produk 5 kategori, harga jual int).
+  - Update akumulasi `total_tunai` / `total_qris` dan `kas_seharusnya` di tabel `shift_kasir`.
 - [ ] **Step 3: Implementasi client service `checkout-service.ts`**
-  - Wrapper pemanggil RPC `process_checkout` dari Next.js Server Action / Route Handler.
+  - Wrapper pemanggil RPC `proses_checkout_transaksi` dari Next.js Server Action / Route Handler.
 - [ ] **Step 4: Commit**
   ```bash
   git add supabase/migrations/20261021000003_stored_procedures.sql src/lib/services/checkout-service.ts tests/
@@ -280,7 +284,7 @@ lumbung-multi-pos/
 - [ ] **Step 1: Implementasi Katalog Produk**
   - Grid kartu produk responsif tablet 10" (3-4 kolom).
   - Badge stok cabang *real-time* (peringatan warna jika stok $\le$ minimum).
-  - Filter kategori (`minuman_racikan`, `roti_kue`, `kemasan`) dan kotak pencarian teks instan.
+  - Filter kategori (`kopi`, `non_kopi`, `roti`, `snack`, `kemasan`) dan kotak pencarian teks instan.
 - [ ] **Step 2: Implementasi Panel Keranjang Belanja**
   - List item pesanan, tombol +/- kuantitas (1-99), hitung subtotal otomatis.
   - Tombol Buka Modal Diskon (validasi input $\le 10\%$, alasan wajib).
@@ -288,7 +292,7 @@ lumbung-multi-pos/
 - [ ] **Step 3: Implementasi Modal Pembayaran**
   - Pilihan metode: Tunai vs QRIS Manual (vs QRIS Mayar opsional).
   - Tunai: kalkulasi kembalian otomatis. Validasi uang diterima $\ge$ total.
-  - Tombol Simpan Transaksi memanggil `process_checkout()`.
+  - Tombol Simpan Transaksi memanggil `proses_checkout_transaksi()`.
 - [ ] **Step 4: Implementasi Dialog Struk & Cetak 58mm/PDF**
   - Komponen struk dengan format toko Lumbung Kopi dan Roti, nomor struk, tanggal, kasir, rincian produk, subtotal, diskon, total, metode bayar.
   - Utility CSS `@media print` untuk ukuran kertas thermal 58mm dan opsi simpan PDF.
@@ -317,16 +321,16 @@ lumbung-multi-pos/
 - [ ] **Step 1: Write tests for Void requirements (TC-13, TC-14, TC-15)**
   - Uji kasir dilarang void (403 Forbidden).
   - Uji alasan void $< 10$ karakter ditolak.
-  - Uji void mengembalikan stok cabang dan mencatat entri di `audit_logs`.
-- [ ] **Step 2: Buat Stored Procedure `void_transaction` di SQL**
-  - Cek otorisasi pemanggil: role harus `kepala_toko` pada cabang yang bersangkutan atau `owner`.
+  - Uji void mengembalikan stok cabang dan mencatat entri di `audit_log`.
+- [ ] **Step 2: Buat Stored Procedure `eksekusi_void_transaksi` di SQL**
+  - Cek otorisasi pemanggil: role harus `kepala_toko` pada cabang yang bersangkutan atau `owner` (BR-08).
   - Cek status transaksi: harus `lunas`.
-  - Cek tanggal: harus `created_at::DATE = CURRENT_DATE`.
+  - Cek tanggal: harus `(dibuat_pada AT TIME ZONE 'Asia/Jakarta')::DATE = CURRENT_DATE`.
   - Cek shift transaksi: shift harus masih `buka`.
-  - Update status transaksi menjadi `void`, simpan `void_reason`, `voided_by`, `voided_at`.
-  - Kembalikan stok item transaksi ke `branch_stock`.
-  - Kurangi akumulasi kas/QRIS di `cashier_shifts`.
-  - Catat log ke `audit_logs`.
+  - Update status transaksi menjadi `void`, simpan `void_reason`, `void_oleh`, `void_pada`.
+  - Kembalikan stok item transaksi ke `stok_cabang`.
+  - Kurangi akumulasi kas/QRIS di `shift_kasir`.
+  - Catat log ke `audit_log` (BR-12).
 - [ ] **Step 3: Implementasi UI Halaman Transaksi**
   - Tabel transaksi dengan filter tanggal, status, metode bayar, dan filter cabang (jika Owner).
   - Kasir hanya melihat transaksi miliknya; Kepala Toko melihat cabangnya; Owner melihat semua cabang.
@@ -351,7 +355,7 @@ lumbung-multi-pos/
 - Create: `tests/unit/stock-and-verify.test.ts`
 
 **Interfaces:**
-- Produces: `adjustStock(branchId, productId, type, newQuantity, reason)`, `verifyShift(shiftId)`
+- Produces: `sesuaikan_stok_cabang(cabangId, produkId, jumlahBaru, alasan)`, `verifikasi_shift_kasir(shiftId, catatanVerifikasi)`
 
 - [ ] **Step 1: Write tests for stock adjustment & shift verification (TC-17)**
   - Uji Kepala Toko hanya dapat mengatur stok cabangnya.
@@ -392,7 +396,7 @@ lumbung-multi-pos/
   - Uji Kepala Toko tidak dapat melihat harga modal di response API.
   - Uji produk nonaktif tidak dapat dijual.
 - [ ] **Step 2: Implementasi Halaman Produk (`/produk`)**
-  - Mode Owner: Tambah/ubah produk, SKU, kategori, pelacakan stok, harga jual, dan modal.
+  - Mode Owner: Tambah/ubah produk, SKU, 5 kategori (`kopi`, `non_kopi`, `roti`, `snack`, `kemasan`), pelacakan stok, harga jual, dan modal.
   - Mode Kepala Toko: *Read-only*, kolom harga modal dihilangkan dari tabel dan payload.
 - [ ] **Step 3: Implementasi Halaman Pengaturan (`/pengaturan`)**
   - Manajemen Akun Staf: nama, email, cabang, peran, toggle status aktif.
@@ -424,7 +428,7 @@ lumbung-multi-pos/
 
 - [ ] **Step 1: Write unit tests for Report metrics and role protection (TC-02, TC-18)**
   - Uji Kepala Toko hanya menerima data cabangnya dan tanpa metrik laba.
-  - Uji kalkulasi laba kotor hanya berjalan untuk peran Owner berdasarkan snapshot harga modal saat transaksi.
+  - Uji kalkulasi laba kotor hanya berjalan untuk peran Owner berdasarkan harga modal di `riwayat_harga_modal` yang berlaku saat transaksi dibuat.
 - [ ] **Step 2: Implementasi Report Server Functions**
   - Agregasi omzet, total transaksi, average order value, void count.
   - Query data grafik penjualan harian, 10 produk terlaris, dan rasio tunai/QRIS.

@@ -38,32 +38,33 @@ Lumbung MultiPOS adalah sistem kasir (Point of Sale) multi-cabang berbasis web y
 
 ## 3. Skema Basis Data & Keamanan
 
-### 3.1 Entitas Data Utama
-1. `branches`
-   - `id` (UUID, PK), `code` (VARCHAR(3), UNIQUE: 'TBT', 'BTR', 'DPK'), `name`, `address`, `created_at`.
+### 3.1 Entitas Data Utama (9 Tabel Inti sesuai ERD)
+1. `cabang`
+   - `id` (UUID, PK), `kode` (TEXT, UNIQUE: 'TBT', 'BTR', 'DPK'), `nama` (TEXT), `alamat` (TEXT), `aktif` (BOOLEAN, default true), `urut_struk_tanggal` (DATE, WIB), `urut_struk_terakhir` (INT, default 0, CHECK $\ge 0$).
 2. `profiles`
-   - `id` (UUID, PK, references `auth.users`), `name`, `email`, `role` (ENUM: `'kasir'`, `'kepala_toko'`, `'owner'`), `branch_id` (FK `branches.id`, nullable for Owner), `is_active` (BOOLEAN, default true).
-3. `products`
-   - `id` (UUID, PK), `sku` (VARCHAR, UNIQUE), `name`, `category` (ENUM: `'minuman_racikan'`, `'roti_kue'`, `'kemasan'`), `selling_price` (NUMERIC), `is_stock_tracked` (BOOLEAN), `is_active` (BOOLEAN, default true).
-4. `cost_price_history` *(Rahasia, RLS ketat Owner only)*
-   - `id` (UUID, PK), `product_id` (FK `products.id`), `cost_price` (NUMERIC), `effective_from` (TIMESTAMPTZ, no retroactive change).
-5. `branch_stock`
-   - `id` (UUID, PK), `branch_id` (FK), `product_id` (FK), `quantity` (INT, CHECK $\ge 0$), `minimum_stock` (INT, default 5).
-6. `cashier_shifts`
-   - `id` (UUID, PK), `branch_id` (FK), `cashier_id` (FK `profiles.id`), `status` (ENUM: `'buka'`, `'ditutup'`, `'diverifikasi'`), `opening_cash` (NUMERIC, 0 - 2.000.000), `total_cash_sales` (NUMERIC, default 0), `total_qris_sales` (NUMERIC, default 0), `expected_cash` (NUMERIC, default 0), `actual_cash` (NUMERIC, nullable), `cash_difference` (NUMERIC, nullable), `notes` (TEXT, nullable), `opened_at` (TIMESTAMPTZ), `closed_at` (TIMESTAMPTZ), `verified_by` (FK `profiles.id`), `verified_at` (TIMESTAMPTZ).
-7. `daily_invoice_counters`
-   - `branch_id` (FK), `date` (DATE), `last_sequence` (INT, default 0), PRIMARY KEY (`branch_id`, `date`).
-8. `transactions`
-   - `id` (UUID, PK), `invoice_number` (VARCHAR, UNIQUE, format `KODE-YYYYMMDD-NNNN`), `branch_id` (FK), `shift_id` (FK `cashier_shifts.id`), `cashier_id` (FK `profiles.id`), `status` (ENUM: `'lunas'`, `'void'`, `'menunggu_bayar'`, `'batal'`), `subtotal` (NUMERIC), `discount_amount` (NUMERIC, default 0), `discount_reason` (TEXT, nullable), `total_amount` (NUMERIC), `payment_method` (ENUM: `'tunai'`, `'qris_manual'`, `'qris_mayar'`), `cash_tendered` (NUMERIC, nullable), `change_returned` (NUMERIC, nullable), `void_reason` (TEXT, nullable), `voided_by` (FK `profiles.id`), `voided_at` (TIMESTAMPTZ), `created_at` (TIMESTAMPTZ).
-9. `transaction_items`
-   - `id` (UUID, PK), `transaction_id` (FK `transactions.id`), `product_id` (FK), `product_name` (VARCHAR), `unit_price` (NUMERIC), `unit_cost_price` (NUMERIC, snapshot saat transaksi), `quantity` (INT, 1-99), `subtotal` (NUMERIC).
-10. `audit_logs` *(Immutable, INSERT only)*
-    - `id` (UUID, PK), `user_id` (FK `profiles.id`), `action` (VARCHAR), `entity_name` (VARCHAR), `entity_id` (VARCHAR), `previous_state` (JSONB), `new_state` (JSONB), `created_at` (TIMESTAMPTZ).
+   - `id` (UUID, PK, references `auth.users(id)`), `nama_lengkap` (TEXT), `email` (TEXT, UNIQUE), `peran` (TEXT: `'kasir'`, `'kepala_toko'`, `'owner'`), `cabang_id` (FK `cabang.id`, wajib untuk kasir & kepala toko, NULL untuk owner), `aktif` (BOOLEAN, default false), `dibuat_pada` (TIMESTAMPTZ).
+   - Constraint: 1 kepala toko aktif per cabang (`idx_one_active_kepala_toko_per_branch`).
+3. `produk`
+   - `id` (UUID, PK), `sku` (TEXT, UNIQUE), `nama` (TEXT), `kategori` (TEXT: `'kopi'`, `'non_kopi'`, `'roti'`, `'snack'`, `'kemasan'`), `harga_jual` (INT, CHECK $> 0$), `lacak_stok` (BOOLEAN, default true), `aktif` (BOOLEAN, default true), `dibuat_pada` (TIMESTAMPTZ), `diubah_pada` (TIMESTAMPTZ).
+4. `riwayat_harga_modal` *(DATA RAHASIA, RLS ketat Owner only)*
+   - `id` (UUID, PK), `produk_id` (FK `produk.id`), `harga_modal` (INT, CHECK $\ge 0$), `berlaku_mulai` (TIMESTAMPTZ, UNIQUE bersama `produk_id`), `dibuat_oleh` (FK `profiles.id`), `dibuat_pada` (TIMESTAMPTZ).
+5. `stok_cabang`
+   - `id` (UUID, PK), `cabang_id` (FK `cabang.id`), `produk_id` (FK `produk.id`), UNIQUE (`cabang_id`, `produk_id`), `jumlah` (INT, CHECK $\ge 0$), `stok_minimum` (INT, default 5, CHECK $\ge 0$), `diubah_pada` (TIMESTAMPTZ).
+6. `shift_kasir`
+   - `id` (UUID, PK), `cabang_id` (FK `cabang.id`), `kasir_id` (FK `profiles.id`), `status` (TEXT: `'buka'`, `'ditutup'`, `'diverifikasi'`), `dibuka_pada` (TIMESTAMPTZ), `kas_awal` (INT, CHECK $0 - 2.000.000$), `ditutup_pada` (TIMESTAMPTZ, wajib jika bukan buka), `total_tunai` (INT, default 0), `total_qris` (INT, default 0), `kas_seharusnya` (INT, default 0), `uang_fisik` (INT, nullable), `selisih` (INT, nullable), `catatan_tutup` (TEXT, wajib bila $|\text{selisih}| > 20.000$), `diverifikasi_oleh` (FK `profiles.id`), `diverifikasi_pada` (TIMESTAMPTZ), `catatan_verifikasi` (TEXT).
+   - Constraint: 1 shift buka per kasir (`idx_one_open_shift_per_cashier`).
+7. `transaksi`
+   - `id` (UUID, PK), `nomor_struk` (TEXT, UNIQUE, format `KODE-YYYYMMDD-NNNN`), `cabang_id` (FK `cabang.id`), `shift_id` (FK `shift_kasir.id`), `kasir_id` (FK `profiles.id`), `status` (TEXT: `'lunas'`, `'void'`, `'menunggu_bayar'`, `'batal'`), `subtotal` (INT, CHECK $> 0$), `diskon` (INT, default 0, CHECK $\le 10\%$ subtotal), `alasan_diskon` (TEXT, wajib bila diskon $> 0$), `total` (INT, $subtotal - diskon$), `metode_bayar` (TEXT: `'tunai'`, `'qris'`), `uang_diterima` (INT, Tunai: $\ge total$, QRIS: $= total$), `kembalian` (INT, default 0), `dibuat_pada` (TIMESTAMPTZ), `dibayar_pada` (TIMESTAMPTZ), `void_oleh` (FK `profiles.id`), `void_pada` (TIMESTAMPTZ), `alasan_void` (TEXT, wajib minimal 10 karakter bila status void), `mayar_invoice_id` (TEXT, UNIQUE, nullable).
+8. `transaksi_item`
+   - `id` (UUID, PK), `transaksi_id` (FK `transaksi.id` ON DELETE CASCADE), `produk_id` (FK `produk.id`), `nama_produk` (TEXT), `harga_satuan` (INT, CHECK $> 0$), `jumlah` (INT, CHECK $1 - 99$), `subtotal` (INT, $harga\_satuan \times jumlah$).
+   - Constraint: 1 produk sekali per transaksi (`UNIQUE (transaksi_id, produk_id)`).
+9. `audit_log` *(Immutable, INSERT only, HANYA BISA DIBACA OWNER)*
+   - `id` (BIGINT, IDENTITY, PK), `pelaku_id` (FK `profiles.id`), `aksi` (TEXT: `'void_transaksi'`, `'verifikasi_shift'`, `'penyesuaian_stok'`, `'ubah_harga_jual'`, `'ubah_harga_modal'`, `'nonaktifkan_produk'`, `'ubah_akun'`), `tabel` (TEXT), `data_id` (UUID), `nilai_sebelum` (JSONB), `nilai_sesudah` (JSONB), `dibuat_pada` (TIMESTAMPTZ).
 
 ### 3.2 Aturan Keamanan Database & RLS
-- **Isolasi Cabang**: `kasir` dan `kepala_toko` hanya dapat membaca dan menulis baris data yang memiliki `branch_id` sama dengan `profile.branch_id` mereka.
-- **Kerahasiaan Modal & Laba**: Tabel `cost_price_history` dan kolom `unit_cost_price` di `transaction_items` hanya memiliki policy `SELECT` untuk `auth.jwt() ->> 'role' = 'owner'`.
-- **Integritas Shift & Checkout**: Transaksi checkout dieksekusi melalui Postgres RPC `process_checkout()` yang mengunci baris stok produk (`SELECT ... FOR UPDATE`) dalam satu transaksi ACID untuk menjamin tidak ada stok negatif dan nomor struk tidak dobel.
+- **Isolasi Cabang**: `kasir` dan `kepala_toko` hanya dapat membaca dan menulis baris data yang memiliki `cabang_id` sama dengan `profile.cabang_id` mereka.
+- **Kerahasiaan Modal & Laba**: Tabel `riwayat_harga_modal` hanya memiliki policy `SELECT` untuk `is_owner() = true`. Laba dihitung secara aman di server/RPC dengan menggabungkan `riwayat_harga_modal` sesuai tanggal berlaku transaksi (`berlaku_mulai <= transaksi.dibuat_pada`).
+- **Integritas Shift, Struk & Concurrency**: Checkout dieksekusi melalui Postgres RPC `proses_checkout_transaksi()` yang mengunci baris `stok_cabang` (`SELECT ... FOR UPDATE`) dan baris `cabang` (`FOR UPDATE` untuk nomor urut struk harian anti-race condition) dalam satu transaksi ACID. Void dieksekusi melalui RPC `eksekusi_void_transaksi()`.
 
 ---
 
