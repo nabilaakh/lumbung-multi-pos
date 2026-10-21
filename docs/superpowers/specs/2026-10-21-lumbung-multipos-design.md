@@ -20,7 +20,7 @@ Lumbung MultiPOS adalah sistem kasir (Point of Sale) multi-cabang berbasis web y
 ## 2. Arsitektur Sistem & Tumpukan Teknologi (Tech Stack)
 
 ### 2.1 Komponen Sistem
-- **Frontend & Framework**: Next.js (App Router, React, TypeScript, Tailwind CSS).
+- **Frontend & Framework**: Next.js (App Router, React, TypeScript, Tailwind CSS v3.4).
   - Desain antarmuka responsif optimal untuk tablet 10" (resolusi $\ge 1024$px) serta desktop.
   - Performa cepat (< 2 detik waktu muat halaman, < 1 detik penyimpanan transaksi pada koneksi normal).
   - Cetak Struk: Integrasi thermal printer 58mm via browser print API dan ekspor format PDF.
