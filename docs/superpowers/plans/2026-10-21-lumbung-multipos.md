@@ -137,7 +137,7 @@ lumbung-multi-pos/
 - Produces: 9 tabel utama sesuai ERD (`cabang`, `profiles`, `produk`, `riwayat_harga_modal`, `stok_cabang`, `shift_kasir`, `transaksi`, `transaksi_item`, `audit_log`).
 - Produces: RLS Policies penegak isolasi cabang dan kerahasiaan `riwayat_harga_modal` (BR-01, BR-11, BR-12).
 
-- [ ] **Step 1: Tulis migration 9 tabel utama, constraint, dan foreign keys**
+- [x] **Step 1: Tulis migration 9 tabel utama, constraint, dan foreign keys**
   - Tabel `cabang` (TBT, BTR, DPK, urut_struk_tanggal, urut_struk_terakhir).
   - Tabel `profiles` (terkait `auth.users(id)`, peran: `kasir`, `kepala_toko`, `owner`, status `aktif`, constraint 1 kepala toko aktif per cabang).
   - Tabel `produk` (kategori: `kopi`, `non_kopi`, `roti`, `snack`, `kemasan`, harga_jual integer, lacak_stok, aktif).
@@ -147,14 +147,14 @@ lumbung-multi-pos/
   - Tabel `transaksi` (nomor_struk unik, cabang_id, shift_id, kasir_id, subtotal, diskon <= 10%, total, metode_bayar, uang_diterima, kembalian, void data).
   - Tabel `transaksi_item` (transaksi_id, produk_id, nama_produk, harga_satuan, jumlah 1-99, subtotal).
   - Tabel `audit_log` (id identity, pelaku_id, aksi, tabel, data_id, nilai_sebelum, nilai_sesudah, dibuat_pada).
-- [ ] **Step 2: Tulis RLS Policies**
+- [x] **Step 2: Tulis RLS Policies**
   - `profiles`: user membaca profil sendiri/cabang; Owner membaca/mengubah semua.
   - `stok_cabang`, `transaksi`, `shift_kasir`: Kasir & Kepala Toko terisolasi ke `cabang_id`. Owner bebas akses.
   - `riwayat_harga_modal`: HANYA Owner yang memiliki izin SELECT / INSERT. Kasir dan Kepala Toko ditolak total di tingkat RLS.
   - `audit_log`: INSERT diizinkan untuk fungsi/sistem; SELECT untuk Owner; UPDATE/DELETE ditolak total (*immutable*).
-- [ ] **Step 3: Generate TypeScript types**
+- [x] **Step 3: Generate TypeScript types**
   - Buat `src/types/database.ts` yang mencerminkan 9 tabel Supabase.
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
   ```bash
   git add supabase/ src/types/database.ts
   git commit -m "feat(db): add 9 tables schema, migrations, and RLS policies from ERD_POS"
