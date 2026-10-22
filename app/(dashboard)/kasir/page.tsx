@@ -222,7 +222,7 @@ export default function KasirPOSPage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-2 text-muted-foreground text-sm">
-          <Clock className="h-6 w-6 animate-spin text-amber-600" />
+          <Clock className="h-6 w-6 animate-spin text-primary" />
           <span>Memuat sistem kasir POS...</span>
         </div>
       </div>
@@ -233,9 +233,9 @@ export default function KasirPOSPage() {
   if (!activeShift) {
     return (
       <div className="max-w-2xl mx-auto py-12">
-        <Card className="border-dashed border-2 border-amber-600/50 bg-amber-500/5 shadow-md">
+        <Card className="border-dashed border-2 border-primary/50 bg-primary/5 shadow-md">
           <CardContent className="flex flex-col items-center text-center p-8 space-y-4">
-            <div className="h-16 w-16 rounded-full bg-amber-500/10 text-amber-700 flex items-center justify-center">
+            <div className="h-16 w-16 rounded-full bg-primary/10 text-primary flex items-center justify-center">
               <Clock className="h-8 w-8" />
             </div>
             <div>
@@ -246,7 +246,7 @@ export default function KasirPOSPage() {
                 Sesuai aturan operasional toko, Anda harus membuka sesi shift kasir dan mencatat kas awal di laci sebelum dapat memproses transaksi penjualan.
               </p>
             </div>
-            <Button asChild className="h-11 px-6 shadow-md bg-amber-700 hover:bg-amber-800 text-white font-medium">
+            <Button asChild className="h-11 px-6 shadow-md bg-primary hover:bg-primary/90 text-primary-foreground font-medium">
               <Link href="/shift-saya">
                 <span>Buka Shift Saya Sekarang</span>
                 <ArrowRight className="h-4 w-4 ml-2" />

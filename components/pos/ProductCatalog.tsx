@@ -79,7 +79,7 @@ export function ProductCatalog({ products, onAddToCart }: ProductCatalogProps) {
                 onClick={() => setSelectedCategory(cat.key)}
                 className={`h-9 px-3.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
                   isSelected
-                    ? 'bg-amber-700 hover:bg-amber-800 text-white shadow-xs'
+                    ? 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-xs'
                     : 'bg-card text-muted-foreground hover:text-foreground'
                 }`}
               >
@@ -111,7 +111,7 @@ export function ProductCatalog({ products, onAddToCart }: ProductCatalogProps) {
                   className={`border transition-all select-none flex flex-col justify-between ${
                     isOutOfStock
                       ? 'opacity-50 cursor-not-allowed bg-muted/40'
-                      : 'cursor-pointer hover:border-amber-600/50 hover:shadow-md active:scale-[0.98] bg-card'
+                      : 'cursor-pointer hover:border-primary/50 hover:shadow-md active:scale-[0.98] bg-card'
                   }`}
                 >
                   <CardContent className="p-3.5 flex flex-col justify-between h-full">
@@ -140,7 +140,7 @@ export function ProductCatalog({ products, onAddToCart }: ProductCatalogProps) {
                     </div>
 
                     <div className="mt-3 pt-2 border-t border-border/50 flex items-center justify-between">
-                      <span className="text-sm font-extrabold text-amber-900 dark:text-amber-400">
+                      <span className="text-sm font-extrabold text-primary">
                         Rp{prod.harga_jual.toLocaleString('id-ID')}
                       </span>
                       <span className="text-[10px] text-muted-foreground capitalize">

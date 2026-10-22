@@ -75,7 +75,7 @@ export function CartPanel({
     <Card className="flex flex-col h-full border shadow-md bg-card">
       <CardHeader className="py-3.5 px-4 border-b flex flex-row items-center justify-between space-y-0">
         <div className="flex items-center gap-2">
-          <ShoppingCart className="h-5 w-5 text-amber-700" />
+          <ShoppingCart className="h-5 w-5 text-primary" />
           <CardTitle className="text-base font-bold">Keranjang Pesanan</CardTitle>
           <Badge variant="secondary" className="text-xs px-2 py-0.5">
             {cart.reduce((sum, item) => sum + item.jumlah, 0)} item
@@ -180,7 +180,7 @@ export function CartPanel({
           <div className="w-full space-y-2 p-2.5 rounded-lg bg-card border text-xs">
             <div className="flex items-center justify-between">
               <span className="font-semibold text-foreground flex items-center gap-1">
-                <Percent className="h-3.5 w-3.5 text-amber-700" />
+                <Percent className="h-3.5 w-3.5 text-primary" />
                 Diskon Promo (Maks 10%)
               </span>
               <span className="text-muted-foreground text-[11px]">
@@ -226,7 +226,7 @@ export function CartPanel({
             )}
             <div className="flex justify-between items-center text-base font-extrabold text-foreground pt-1 border-t">
               <span>Total Tagihan</span>
-              <span className="text-xl text-amber-800 dark:text-amber-400">
+              <span className="text-xl text-primary">
                 Rp{total.toLocaleString('id-ID')}
               </span>
             </div>
@@ -236,7 +236,7 @@ export function CartPanel({
             type="button"
             onClick={handleCheckoutClick}
             disabled={cart.length === 0}
-            className="w-full h-12 text-base font-bold shadow-md bg-amber-700 hover:bg-amber-800 text-white"
+            className="w-full h-12 text-base font-bold shadow-md bg-primary hover:bg-primary/90 text-primary-foreground"
           >
             <span>Lanjut Pembayaran</span>
             <ArrowRight className="h-5 w-5 ml-2" />

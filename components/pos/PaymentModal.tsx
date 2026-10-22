@@ -113,7 +113,7 @@ export function PaymentModal({
     <Dialog open={isOpen} onOpenChange={(open) => !isLoading && !open && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-500/10 text-amber-700 mb-2">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary mb-2">
             <Receipt className="h-6 w-6" />
           </div>
           <DialogTitle className="text-xl">Pembayaran Transaksi</DialogTitle>
@@ -161,7 +161,7 @@ export function PaymentModal({
                 }}
                 className={`h-12 text-sm font-semibold flex items-center justify-center gap-2 ${
                   metodeBayar === 'tunai'
-                    ? 'bg-amber-700 hover:bg-amber-800 text-white'
+                    ? 'bg-primary hover:bg-primary/90 text-primary-foreground'
                     : 'bg-card'
                 }`}
               >
@@ -179,7 +179,7 @@ export function PaymentModal({
                 }}
                 className={`h-12 text-sm font-semibold flex items-center justify-center gap-2 ${
                   metodeBayar === 'qris'
-                    ? 'bg-amber-700 hover:bg-amber-800 text-white'
+                    ? 'bg-primary hover:bg-primary/90 text-primary-foreground'
                     : 'bg-card'
                 }`}
               >

@@ -108,7 +108,7 @@ export function ReceiptModal({
           <Button
             type="button"
             onClick={onNewTransaction}
-            className="flex-1 h-11 bg-amber-700 hover:bg-amber-800 text-white font-bold"
+            className="flex-1 h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-bold"
           >
             <PlusCircle className="h-4 w-4 mr-2" />
             Transaksi Baru
