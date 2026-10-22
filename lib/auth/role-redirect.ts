@@ -8,7 +8,7 @@ export interface AccountValidationResult {
 /**
  * Mendapatkan rute utama (home route) sesuai peran pengguna (BR-01)
  */
-export function getHomeRouteForRole(peran: PeranPengguna): string {
+export function getHomeRouteForRole(peran: PeranPengguna | string): string {
   switch (peran) {
     case 'kasir':
       return '/kasir';
@@ -50,7 +50,7 @@ export function validateUserAccountStatus(
 /**
  * Menentukan apakah sebuah rute boleh diakses oleh peran tertentu berdasarkan Matriks Akses
  */
-export function isRouteAllowedForRole(peran: PeranPengguna, pathname: string): boolean {
+export function isRouteAllowedForRole(peran: PeranPengguna | string, pathname: string): boolean {
   // Owner memiliki akses penuh ke seluruh rute
   if (peran === 'owner') {
     return true;

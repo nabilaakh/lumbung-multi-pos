@@ -96,28 +96,30 @@ lumbung-multi-pos/
 ### Task 1: Project Scaffolding, TypeScript, Tailwind CSS v3.4, shadcn/ui, and Testing Setup
 
 **Files:**
+
 - Create: `package.json`, `tsconfig.json`, `tailwind.config.ts`, `postcss.config.js`, `netlify.toml`, `components.json`
 - Create: `src/app/layout.tsx`, `src/app/page.tsx`, `src/app/globals.css`
 - Create: `src/components/ui/` (shadcn primitives: button, card, badge, dialog, input, table, tabs, dropdown-menu)
 - Create: `vitest.config.ts`, `tests/unit/setup.test.ts`
 
 **Interfaces:**
+
 - Produces: Base Next.js app with Tailwind v3.4 design tokens, shadcn/ui components (Radix base, preset `b1tgXpkWI`), shared UI primitives, and Vitest test runner.
 
-- [x] **Step 1: Inisialisasi package.json dan instalasi dependencies**
+- [X] **Step 1: Inisialisasi package.json dan instalasi dependencies**
   - Next.js 14+, React 18/19, TypeScript, Tailwind CSS v3.4, `@supabase/ssr`, `@supabase/supabase-js`, Lucide React icons, Vitest, `@testing-library/react`.
-- [x] **Step 2: Inisialisasi shadcn/ui menggunakan preset**
+- [X] **Step 2: Inisialisasi shadcn/ui menggunakan preset**
   - Jalankan: `npx shadcn@latest init --preset b1tgXpkWI --base radix --template next`
   - Verifikasi `components.json` terbuat dan terkonfigurasi dengan benar.
-- [x] **Step 3: Konfigurasi Tailwind CSS v3.4, tema Lumbung, dan PostCSS**
+- [X] **Step 3: Konfigurasi Tailwind CSS v3.4, tema Lumbung, dan PostCSS**
   - `tailwind.config.ts`: sesuaikan tema Lumbung Kopi dan Roti (palet earthy amber, warm stone, espresso dark), serta breakpoint tablet `min-w-[1024px]`.
   - Pasang komponen UI dasar: `npx shadcn@latest add button card badge dialog input table tabs dropdown-menu`
-- [x] **Step 4: Konfigurasi Netlify and Robots Noindex**
+- [X] **Step 4: Konfigurasi Netlify and Robots Noindex**
   - Buat `netlify.toml` dengan Next.js plugin dan custom headers `X-Robots-Tag: noindex, nofollow`.
-- [x] **Step 5: Buat Unit Test Sederhana Vitest**
+- [X] **Step 5: Buat Unit Test Sederhana Vitest**
   - `tests/unit/setup.test.ts`: Uji bahwa environment test berjalan normal.
   - Jalankan `npm test` untuk memverifikasi.
-- [x] **Step 6: Commit**
+- [X] **Step 6: Commit**
   ```bash
   git add .
   git commit -m "chore: scaffold Next.js App Router with Tailwind CSS v3.4, shadcn preset, and Vitest"
@@ -128,16 +130,18 @@ lumbung-multi-pos/
 ### Task 2: Supabase Database Schema, Migrations, and RLS Policies
 
 **Files:**
+
 - Create: `supabase/migrations/20261021000001_initial_schema.sql`
 - Create: `supabase/migrations/20261021000002_rls_policies.sql`
 - Create: `src/types/database.ts`
 - Create: `tests/unit/schema-types.test.ts`
 
 **Interfaces:**
+
 - Produces: 9 tabel utama sesuai ERD (`cabang`, `profiles`, `produk`, `riwayat_harga_modal`, `stok_cabang`, `shift_kasir`, `transaksi`, `transaksi_item`, `audit_log`).
 - Produces: RLS Policies penegak isolasi cabang dan kerahasiaan `riwayat_harga_modal` (BR-01, BR-11, BR-12).
 
-- [x] **Step 1: Tulis migration 9 tabel utama, constraint, dan foreign keys**
+- [X] **Step 1: Tulis migration 9 tabel utama, constraint, dan foreign keys**
   - Tabel `cabang` (TBT, BTR, DPK, urut_struk_tanggal, urut_struk_terakhir).
   - Tabel `profiles` (terkait `auth.users(id)`, peran: `kasir`, `kepala_toko`, `owner`, status `aktif`, constraint 1 kepala toko aktif per cabang).
   - Tabel `produk` (kategori: `kopi`, `non_kopi`, `roti`, `snack`, `kemasan`, harga_jual integer, lacak_stok, aktif).
@@ -147,14 +151,14 @@ lumbung-multi-pos/
   - Tabel `transaksi` (nomor_struk unik, cabang_id, shift_id, kasir_id, subtotal, diskon <= 10%, total, metode_bayar, uang_diterima, kembalian, void data).
   - Tabel `transaksi_item` (transaksi_id, produk_id, nama_produk, harga_satuan, jumlah 1-99, subtotal).
   - Tabel `audit_log` (id identity, pelaku_id, aksi, tabel, data_id, nilai_sebelum, nilai_sesudah, dibuat_pada).
-- [x] **Step 2: Tulis RLS Policies**
+- [X] **Step 2: Tulis RLS Policies**
   - `profiles`: user membaca profil sendiri/cabang; Owner membaca/mengubah semua.
   - `stok_cabang`, `transaksi`, `shift_kasir`: Kasir & Kepala Toko terisolasi ke `cabang_id`. Owner bebas akses.
   - `riwayat_harga_modal`: HANYA Owner yang memiliki izin SELECT / INSERT. Kasir dan Kepala Toko ditolak total di tingkat RLS.
   - `audit_log`: INSERT diizinkan untuk fungsi/sistem; SELECT untuk Owner; UPDATE/DELETE ditolak total (*immutable*).
-- [x] **Step 3: Generate TypeScript types**
+- [X] **Step 3: Generate TypeScript types**
   - Buat `src/types/database.ts` yang mencerminkan 9 tabel Supabase.
-- [x] **Step 4: Commit**
+- [X] **Step 4: Commit**
   ```bash
   git add supabase/ src/types/database.ts
   git commit -m "feat(db): add 9 tables schema, migrations, and RLS policies from ERD_POS"
@@ -165,6 +169,7 @@ lumbung-multi-pos/
 ### Task 3: Supabase Client, SSR Middleware, and Login Page (BR-01)
 
 **Files:**
+
 - Create: `src/lib/supabase/client.ts`
 - Create: `src/lib/supabase/server.ts`
 - Create: `src/lib/supabase/middleware.ts`
@@ -173,6 +178,7 @@ lumbung-multi-pos/
 - Create: `tests/unit/auth-validation.test.ts`
 
 **Interfaces:**
+
 - Consumes: `src/types/database.ts`
 - Produces: Supabase SSR client helper, Next.js Middleware route guard, Login UI with role redirection.
 
@@ -202,6 +208,7 @@ lumbung-multi-pos/
 ### Task 4: Cashier Shift Management System (`/shift-saya` & BR-02, BR-09, BR-10)
 
 **Files:**
+
 - Create: `src/app/(dashboard)/shift-saya/page.tsx`
 - Create: `src/components/shift/OpenShiftModal.tsx`
 - Create: `src/components/shift/CloseShiftModal.tsx`
@@ -210,6 +217,7 @@ lumbung-multi-pos/
 - Create: `tests/unit/shift-calculation.test.ts`
 
 **Interfaces:**
+
 - Consumes: Supabase client, User session
 - Produces: `getActiveShift(cashierId)`, `openShift(cashierId, openingCash)`, `closeShift(shiftId, actualCash, notes)`.
 
@@ -234,11 +242,13 @@ lumbung-multi-pos/
 ### Task 5: PostgreSQL RPC for Atomic Checkout & Invoice Numbering (BR-03, BR-04, BR-05, BR-07)
 
 **Files:**
+
 - Create: `supabase/migrations/20261021000003_stored_procedures.sql`
 - Create: `src/lib/services/checkout-service.ts`
 - Create: `tests/integration/atomic-checkout.test.ts`
 
 **Interfaces:**
+
 - Produces: Postgres function `proses_checkout_transaksi(p_shift_id, p_items, p_diskon, p_alasan_diskon, p_metode_bayar, p_uang_diterima)`
 - Produces: Struk format `KODE-YYYYMMDD-NNNN` anti-*race condition* langsung via tabel `cabang`.
 
@@ -269,6 +279,7 @@ lumbung-multi-pos/
 ### Task 6: POS Cashier Interface & Receipt Printing (`/kasir` & BR-02 s.d. BR-07)
 
 **Files:**
+
 - Create: `src/app/(dashboard)/kasir/page.tsx`
 - Create: `src/components/pos/ProductCatalog.tsx`
 - Create: `src/components/pos/CartPanel.tsx`
@@ -278,6 +289,7 @@ lumbung-multi-pos/
 - Create: `src/lib/utils/receipt-printer.ts`
 
 **Interfaces:**
+
 - Consumes: `checkout-service.ts`, `shift-service.ts`
 - Produces: Complete responsive POS screen for cashier with thermal 58mm / PDF print.
 
@@ -307,6 +319,7 @@ lumbung-multi-pos/
 ### Task 7: Transaction History & Void Automation (`/transaksi` & BR-01, BR-08, BR-12)
 
 **Files:**
+
 - Create: `src/app/(dashboard)/transaksi/page.tsx`
 - Create: `src/components/transactions/TransactionTable.tsx`
 - Create: `src/components/transactions/VoidModal.tsx`
@@ -315,6 +328,7 @@ lumbung-multi-pos/
 - Create: `tests/integration/void-transaction.test.ts`
 
 **Interfaces:**
+
 - Consumes: Supabase client, User session
 - Produces: `getTransactions(filter)`, `voidTransaction(transactionId, reason)`
 
@@ -346,6 +360,7 @@ lumbung-multi-pos/
 ### Task 8: Branch Stock & Shift Supervision (`/stok`, `/shift-cabang` & BR-09, BR-10, BR-12)
 
 **Files:**
+
 - Create: `src/app/(dashboard)/stok/page.tsx`
 - Create: `src/components/stock/StockTable.tsx`
 - Create: `src/components/stock/StockAdjustmentModal.tsx`
@@ -355,6 +370,7 @@ lumbung-multi-pos/
 - Create: `tests/unit/stock-and-verify.test.ts`
 
 **Interfaces:**
+
 - Produces: `sesuaikan_stok_cabang(cabangId, produkId, jumlahBaru, alasan)`, `verifikasi_shift_kasir(shiftId, catatanVerifikasi)`
 
 - [ ] **Step 1: Write tests for stock adjustment & shift verification (TC-17)**
@@ -379,6 +395,7 @@ lumbung-multi-pos/
 ### Task 9: Master Products, Settings, and Audit Log (`/produk`, `/pengaturan` & BR-01, BR-11, BR-12)
 
 **Files:**
+
 - Create: `src/app/(dashboard)/produk/page.tsx`
 - Create: `src/components/products/ProductTable.tsx`
 - Create: `src/components/products/ProductFormModal.tsx`
@@ -390,6 +407,7 @@ lumbung-multi-pos/
 - Create: `tests/integration/product-cost-privacy.test.ts`
 
 **Interfaces:**
+
 - Produces: Product management, Cost price history (Owner only), Staff management, Immutable Audit Log viewer.
 
 - [ ] **Step 1: Write integration tests for Cost Price Privacy (TC-09, TC-18)**
@@ -413,6 +431,7 @@ lumbung-multi-pos/
 ### Task 10: Reports & Analytics Dashboard (`/laporan` & BR-01, BR-09, BR-11)
 
 **Files:**
+
 - Create: `src/app/(dashboard)/laporan/page.tsx`
 - Create: `src/components/reports/KpiSummaryCards.tsx`
 - Create: `src/components/reports/SalesBarChart.tsx`
@@ -424,6 +443,7 @@ lumbung-multi-pos/
 - Create: `tests/unit/report-calculation.test.ts`
 
 **Interfaces:**
+
 - Produces: Aggregated sales reports, 3 standard charts, cash variance audit, and Owner-exclusive profit metrics.
 
 - [ ] **Step 1: Write unit tests for Report metrics and role protection (TC-02, TC-18)**
@@ -449,12 +469,14 @@ lumbung-multi-pos/
 ### Task 11: End-to-End Test Suite, Netlify Deployment Verification, and Production Polish
 
 **Files:**
+
 - Create: `tests/e2e/all-test-cases.test.ts`
 - Create: `public/robots.txt`
 - Modify: `netlify.toml`
 - Modify: `README.md`
 
 **Interfaces:**
+
 - Executes all 18 Test Cases (TC-01 through TC-18) against the implemented application.
 - Prepares Netlify deployment configuration.
 
