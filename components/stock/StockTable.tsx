@@ -66,7 +66,7 @@ export function StockTable({
       }
 
       // Category filter
-      if (selectedCategory !== 'all' && item.produk.kategori !== selectedCategory) {
+      if (selectedCategory !== 'all' && item.produk?.kategori !== selectedCategory) {
         return false;
       }
 
@@ -78,8 +78,8 @@ export function StockTable({
       // Search filter (name or sku)
       if (search.trim()) {
         const q = search.toLowerCase();
-        const matchName = item.produk.nama.toLowerCase().includes(q);
-        const matchSku = item.produk.sku.toLowerCase().includes(q);
+        const matchName = (item.produk?.nama ?? '').toLowerCase().includes(q);
+        const matchSku = (item.produk?.sku ?? '').toLowerCase().includes(q);
         if (!matchName && !matchSku) return false;
       }
 
@@ -224,7 +224,7 @@ export function StockTable({
                     }`}
                   >
                     <TableCell className="font-mono text-xs font-semibold text-slate-700">
-                      {item.produk.sku}
+                      {item?.produk?.sku}
                     </TableCell>
                     <TableCell className="text-xs font-semibold text-slate-800">
                       <div>{item.produk.nama}</div>
