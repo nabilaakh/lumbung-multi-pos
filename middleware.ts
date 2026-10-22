@@ -21,6 +21,8 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/kasir') ||
     pathname.startsWith('/shift-saya') ||
     pathname.startsWith('/transaksi') ||
+    pathname.startsWith('/stok') ||
+    pathname.startsWith('/shift-cabang') ||
     pathname.startsWith('/produk') ||
     pathname.startsWith('/laporan') ||
     pathname.startsWith('/pengaturan');

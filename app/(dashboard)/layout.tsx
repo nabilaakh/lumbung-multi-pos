@@ -62,19 +62,19 @@ export default async function DashboardLayout({
       title: 'Kasir POS',
       href: '/kasir',
       icon: ShoppingCart,
-      roles: ['kasir', 'owner'],
+      roles: ['kasir'],
     },
     {
       title: 'Shift Saya',
       href: '/shift-saya',
       icon: Clock,
-      roles: ['kasir', 'kepala_toko', 'owner'],
+      roles: ['kasir'],
     },
     {
       title: 'Riwayat Transaksi',
       href: '/transaksi',
       icon: Receipt,
-      roles: ['kepala_toko', 'owner'],
+      roles: ['kasir', 'kepala_toko', 'owner'],
     },
     {
       title: 'Stok Cabang',

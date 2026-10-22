@@ -6,7 +6,7 @@ import {
 } from '@/lib/auth/role-redirect';
 import type { PeranPengguna, ProfilPengguna } from '@/types/database';
 
-describe('Task 3: Auth Validation & Role-Based Navigation (BR-01)', () => {
+describe('Task 3: Auth Validation & Role-Based Navigation (BR-01 & Bab 7)', () => {
   describe('TC-01: Redirection by Role (Peran Pengguna)', () => {
     it('should redirect kasir to /kasir by default', () => {
       const destination = getHomeRouteForRole('kasir');
@@ -60,35 +60,47 @@ describe('Task 3: Auth Validation & Role-Based Navigation (BR-01)', () => {
     });
   });
 
-  describe('Role-Based Route Protection Matrix', () => {
-    it('should forbid kasir from accessing /pengaturan and /laporan', () => {
-      expect(isRouteAllowedForRole('kasir', '/pengaturan')).toBe(false);
-      expect(isRouteAllowedForRole('kasir', '/laporan')).toBe(false);
-      expect(isRouteAllowedForRole('kasir', '/produk')).toBe(false);
-    });
-
-    it('should allow kasir to access /kasir and /shift-saya', () => {
+  describe('Role-Based Route Protection Matrix (Bab 7)', () => {
+    it('should configure Kasir access: Kasir, Shift Saya, Transaksi (miliknya)', () => {
+      // Allowed
       expect(isRouteAllowedForRole('kasir', '/kasir')).toBe(true);
       expect(isRouteAllowedForRole('kasir', '/shift-saya')).toBe(true);
+      expect(isRouteAllowedForRole('kasir', '/transaksi')).toBe(true);
+
+      // Forbidden
+      expect(isRouteAllowedForRole('kasir', '/stok')).toBe(false);
+      expect(isRouteAllowedForRole('kasir', '/shift-cabang')).toBe(false);
+      expect(isRouteAllowedForRole('kasir', '/produk')).toBe(false);
+      expect(isRouteAllowedForRole('kasir', '/laporan')).toBe(false);
+      expect(isRouteAllowedForRole('kasir', '/pengaturan')).toBe(false);
     });
 
-    it('should forbid kepala_toko from accessing /pengaturan and /laporan/keuntungan', () => {
-      expect(isRouteAllowedForRole('kepala_toko', '/pengaturan')).toBe(false);
-      expect(isRouteAllowedForRole('kepala_toko', '/laporan/keuntungan')).toBe(false);
-    });
-
-    it('should allow kepala_toko to access /transaksi, /shift-saya, and /produk', () => {
+    it('should configure Kepala Toko access: Transaksi, Stok Cabang, Shift Cabang, Produk, Laporan', () => {
+      // Allowed
       expect(isRouteAllowedForRole('kepala_toko', '/transaksi')).toBe(true);
-      expect(isRouteAllowedForRole('kepala_toko', '/shift-saya')).toBe(true);
+      expect(isRouteAllowedForRole('kepala_toko', '/stok')).toBe(true);
+      expect(isRouteAllowedForRole('kepala_toko', '/shift-cabang')).toBe(true);
       expect(isRouteAllowedForRole('kepala_toko', '/produk')).toBe(true);
+      expect(isRouteAllowedForRole('kepala_toko', '/laporan')).toBe(true);
+
+      // Forbidden
+      expect(isRouteAllowedForRole('kepala_toko', '/kasir')).toBe(false);
+      expect(isRouteAllowedForRole('kepala_toko', '/shift-saya')).toBe(false);
+      expect(isRouteAllowedForRole('kepala_toko', '/pengaturan')).toBe(false);
     });
 
-    it('should allow owner to access all operational and administrative routes', () => {
+    it('should configure Owner access: Transaksi, Stok Cabang, Shift Cabang, Produk, Laporan, Pengaturan', () => {
+      // Allowed
+      expect(isRouteAllowedForRole('owner', '/transaksi')).toBe(true);
+      expect(isRouteAllowedForRole('owner', '/stok')).toBe(true);
+      expect(isRouteAllowedForRole('owner', '/shift-cabang')).toBe(true);
+      expect(isRouteAllowedForRole('owner', '/produk')).toBe(true);
       expect(isRouteAllowedForRole('owner', '/laporan')).toBe(true);
       expect(isRouteAllowedForRole('owner', '/pengaturan')).toBe(true);
-      expect(isRouteAllowedForRole('owner', '/transaksi')).toBe(true);
-      expect(isRouteAllowedForRole('owner', '/kasir')).toBe(true);
-      expect(isRouteAllowedForRole('owner', '/produk')).toBe(true);
+
+      // Forbidden (POS kasir & shift kasir hanya untuk peran Kasir)
+      expect(isRouteAllowedForRole('owner', '/kasir')).toBe(false);
+      expect(isRouteAllowedForRole('owner', '/shift-saya')).toBe(false);
     });
   });
 });
