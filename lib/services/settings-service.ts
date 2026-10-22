@@ -30,7 +30,6 @@ export async function getStaffProfiles(): Promise<ProfilPengguna[]> {
       cabang_id,
       aktif,
       dibuat_pada,
-      diubah_pada,
       cabang:cabang_id (
         id,
         kode,
@@ -40,7 +39,7 @@ export async function getStaffProfiles(): Promise<ProfilPengguna[]> {
     .order('nama_lengkap', { ascending: true });
 
   if (error) {
-    console.error('Error fetching staff profiles:', error);
+    console.error('Error fetching staff profiles:', error.message, error);
     throw error;
   }
 
@@ -87,7 +86,7 @@ export async function getBranches(): Promise<Cabang[]> {
     .order('kode', { ascending: true });
 
   if (error) {
-    console.error('Error fetching branches:', error);
+    console.error('Error fetching branches:', error.message, error);
     throw error;
   }
 
@@ -107,7 +106,7 @@ export async function getAuditLogs(limit = 100): Promise<AuditLogEntry[]> {
       nilai_sebelum,
       nilai_sesudah,
       dibuat_pada,
-      pelaku:pelaku_id (
+      pelaku:profiles!audit_log_pelaku_id_fkey (
         id,
         nama_lengkap,
         email,
@@ -118,7 +117,7 @@ export async function getAuditLogs(limit = 100): Promise<AuditLogEntry[]> {
     .limit(limit);
 
   if (error) {
-    console.error('Error fetching audit logs:', error);
+    console.error('Error fetching audit logs:', error.message, error);
     throw error;
   }
 

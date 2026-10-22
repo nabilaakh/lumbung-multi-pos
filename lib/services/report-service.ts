@@ -328,7 +328,7 @@ export async function getReportDashboardData(options: {
       uang_fisik,
       selisih,
       status,
-      profiles:kasir_id (nama_lengkap),
+      profiles:profiles!shift_kasir_kasir_id_fkey (nama_lengkap),
       cabang:cabang_id (kode)
     `)
     .not('selisih', 'is', null)

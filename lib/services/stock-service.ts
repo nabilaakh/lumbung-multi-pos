@@ -27,12 +27,17 @@ export interface ShiftSupervisionItem {
   id: string;
   kasir_id: string;
   cabang_id: string;
+  dibuka_pada: string;
+  ditutup_pada: string | null;
   waktu_buka: string;
   waktu_tutup: string | null;
   kas_awal: number;
+  total_tunai: number;
+  total_qris: number;
   total_penjualan_tunai: number;
   total_penjualan_qris: number;
   kas_seharusnya: number;
+  uang_fisik: number | null;
   kas_aktual: number | null;
   selisih: number | null;
   catatan_tutup: string | null;
@@ -195,7 +200,7 @@ export async function getBranchStock(cabangId?: string): Promise<StockItem[]> {
 
   const { data, error } = await query;
   if (error) {
-    console.error('Error fetching branch stock:', error);
+    console.error('Error fetching branch stock:', error.message, error);
     throw error;
   }
 
@@ -220,7 +225,7 @@ export async function adjustBranchStock(input: StockAdjustmentInput): Promise<{
   });
 
   if (error) {
-    console.error('Error executing sesuaikan_stok_cabang RPC:', error);
+    console.error('Error executing sesuaikan_stok_cabang RPC:', error.message, error);
     return { success: false, message: error.message };
   }
 
@@ -242,20 +247,20 @@ export async function getBranchShifts(cabangId?: string): Promise<ShiftSupervisi
       id,
       kasir_id,
       cabang_id,
-      waktu_buka,
-      waktu_tutup,
+      dibuka_pada,
+      ditutup_pada,
       kas_awal,
-      total_penjualan_tunai,
-      total_penjualan_qris,
+      total_tunai,
+      total_qris,
       kas_seharusnya,
-      kas_aktual,
+      uang_fisik,
       selisih,
       catatan_tutup,
       status,
       diverifikasi_oleh,
       diverifikasi_pada,
       catatan_verifikasi,
-      kasir:kasir_id (
+      kasir:profiles!shift_kasir_kasir_id_fkey (
         id,
         nama_lengkap,
         email
@@ -265,12 +270,12 @@ export async function getBranchShifts(cabangId?: string): Promise<ShiftSupervisi
         kode,
         nama
       ),
-      verifikator:diverifikasi_oleh (
+      verifikator:profiles!shift_kasir_diverifikasi_oleh_fkey (
         id,
         nama_lengkap
       )
     `)
-    .order('waktu_buka', { ascending: false });
+    .order('dibuka_pada', { ascending: false });
 
   if (cabangId && cabangId !== 'all') {
     query = query.eq('cabang_id', cabangId);
@@ -278,11 +283,22 @@ export async function getBranchShifts(cabangId?: string): Promise<ShiftSupervisi
 
   const { data, error } = await query;
   if (error) {
-    console.error('Error fetching branch shifts:', error);
+    console.error('Error fetching branch shifts:', error.message, error);
     throw error;
   }
 
-  return (data as unknown as ShiftSupervisionItem[]) || [];
+  // Map to ShiftSupervisionItem ensuring both schema column names and frontend aliases are populated
+  return (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (data as any[])?.map((s) => ({
+      ...s,
+      waktu_buka: s.dibuka_pada,
+      waktu_tutup: s.ditutup_pada,
+      total_penjualan_tunai: s.total_tunai,
+      total_penjualan_qris: s.total_qris,
+      kas_aktual: s.uang_fisik,
+    })) || []
+  );
 }
 
 /**
@@ -300,7 +316,7 @@ export async function verifyBranchShift(input: ShiftVerificationInput): Promise<
   });
 
   if (error) {
-    console.error('Error executing verifikasi_shift_kasir RPC:', error);
+    console.error('Error executing verifikasi_shift_kasir RPC:', error.message, error);
     return { success: false, message: error.message };
   }
 
