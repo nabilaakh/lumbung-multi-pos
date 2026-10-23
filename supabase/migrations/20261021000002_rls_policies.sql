@@ -128,16 +128,44 @@ CREATE POLICY "Kasir dapat membuka shift miliknya"
     );
 
 DROP POLICY IF EXISTS "Kasir dapat menutup shift; Kepala Toko/Owner dapat memverifikasi" ON public.shift_kasir;
-CREATE POLICY "Kasir dapat menutup shift; Kepala Toko/Owner dapat memverifikasi"
+DROP POLICY IF EXISTS "Kasir dapat menutup shift; Kepala Toko/Owner dapat memverifikas" ON public.shift_kasir;
+DROP POLICY IF EXISTS "Kasir dapat menutup shift miliknya" ON public.shift_kasir;
+DROP POLICY IF EXISTS "Kepala Toko dapat memverifikasi shift cabangnya" ON public.shift_kasir;
+DROP POLICY IF EXISTS "Owner dapat mengelola shift kasir" ON public.shift_kasir;
+
+CREATE POLICY "Kasir dapat menutup shift miliknya"
     ON public.shift_kasir FOR UPDATE
     TO authenticated
     USING (
-        public.is_owner() OR
-        (cabang_id = public.get_user_branch_id() AND (
-            (kasir_id = auth.uid() AND status = 'buka') OR
-            (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND peran = 'kepala_toko' AND aktif = true) AND status = 'ditutup')
-        ))
+        kasir_id = auth.uid() AND
+        cabang_id = public.get_user_branch_id() AND
+        status = 'buka'
+    )
+    WITH CHECK (
+        kasir_id = auth.uid() AND
+        cabang_id = public.get_user_branch_id() AND
+        status = 'ditutup'
     );
+
+CREATE POLICY "Kepala Toko dapat memverifikasi shift cabangnya"
+    ON public.shift_kasir FOR UPDATE
+    TO authenticated
+    USING (
+        cabang_id = public.get_user_branch_id() AND
+        status = 'ditutup' AND
+        EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND peran = 'kepala_toko' AND aktif = true)
+    )
+    WITH CHECK (
+        cabang_id = public.get_user_branch_id() AND
+        status = 'diverifikasi' AND
+        EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND peran = 'kepala_toko' AND aktif = true)
+    );
+
+CREATE POLICY "Owner dapat mengelola shift kasir"
+    ON public.shift_kasir FOR UPDATE
+    TO authenticated
+    USING (public.is_owner())
+    WITH CHECK (public.is_owner());
 
 -- 7. POLICIES: transaksi & transaksi_item (BR-01)
 DROP POLICY IF EXISTS "Membaca transaksi sesuai isolasi cabang & kasir" ON public.transaksi;
