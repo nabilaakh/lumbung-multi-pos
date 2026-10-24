@@ -467,8 +467,31 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      batalkan_transaksi_qris: {
+        Args: {
+          p_alasan?: string
+          p_transaksi_id: string
+        }
+        Returns: Json
+      }
       eksekusi_void_transaksi: {
         Args: { p_alasan_void: string; p_transaksi_id: string }
+        Returns: Json
+      }
+      inisiasi_transaksi_qris: {
+        Args: {
+          p_alasan_diskon?: string
+          p_diskon: number
+          p_items: Json
+          p_shift_id: string
+        }
+        Returns: Json
+      }
+      lunaskan_transaksi_qris: {
+        Args: {
+          p_mayar_invoice_id?: string
+          p_transaksi_id: string
+        }
         Returns: Json
       }
       get_auth_profile: {

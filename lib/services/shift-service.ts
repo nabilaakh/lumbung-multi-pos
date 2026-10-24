@@ -202,6 +202,24 @@ export async function closeShift(
     return { data: null, error: 'Shift ini sudah ditutup sebelumnya.' };
   }
 
+  // PRD Bagian 11.5: Shift tidak dapat ditutup selama masih ada transaksi menunggu_bayar
+  const { count: pendingCount, error: pendingError } = await supabase
+    .from('transaksi')
+    .select('*', { count: 'exact', head: true })
+    .eq('shift_id', params.shiftId)
+    .eq('status', 'menunggu_bayar');
+
+  if (pendingError) {
+    return { data: null, error: 'Gagal memeriksa transaksi tertunda pada shift ini.' };
+  }
+
+  if (pendingCount && pendingCount > 0) {
+    return {
+      data: null,
+      error: `Shift tidak dapat ditutup karena masih ada ${pendingCount} transaksi QRIS yang berstatus menunggu pembayaran. Harap selesaikan atau batalkan transaksi tersebut terlebih dahulu (PRD Bagian 11.5).`,
+    };
+  }
+
   // Hitung total transaksi riil
   const { totalTunai, totalQris, error: totalError } = await calculateCurrentShiftTotals(supabase, params.shiftId);
   if (totalError) {
@@ -237,4 +255,21 @@ export async function closeShift(
   }
 
   return { data: updatedShift, error: null };
+}
+
+/**
+ * Menghitung transaksi berstatus 'menunggu_bayar' pada shift tertentu (PRD Bagian 11.5)
+ */
+export async function countPendingShiftTransactions(
+  supabase: SupabaseClient<Database>,
+  shiftId: string
+): Promise<number> {
+  const { count, error } = await supabase
+    .from('transaksi')
+    .select('*', { count: 'exact', head: true })
+    .eq('shift_id', shiftId)
+    .eq('status', 'menunggu_bayar');
+
+  if (error || !count) return 0;
+  return count;
 }

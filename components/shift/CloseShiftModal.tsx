@@ -8,6 +8,7 @@ import {
   calculateShiftVariance,
   validateCloseShift,
   MAX_VARIANCE_WITHOUT_NOTE,
+  countPendingShiftTransactions,
 } from '@/lib/services/shift-service';
 import type { ShiftKasir } from '@/types/database';
 import {
@@ -43,6 +44,7 @@ export function CloseShiftModal({
   const [uangFisik, setUangFisik] = useState<string>('');
   const [catatanTutup, setCatatanTutup] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
+  const [pendingCount, setPendingCount] = useState<number>(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -50,8 +52,12 @@ export function CloseShiftModal({
       setUangFisik(kasSeharusnya.toString());
       setCatatanTutup('');
       setErrorMessage(null);
+      // Cek apakah ada transaksi QRIS menggantung
+      countPendingShiftTransactions(supabase, shift.id).then((count) => {
+        setPendingCount(count);
+      });
     }
-  }, [isOpen, kasSeharusnya]);
+  }, [isOpen, kasSeharusnya, shift.id, supabase]);
 
   const nominalFisik = parseInt(uangFisik.replace(/\D/g, ''), 10) || 0;
   const selisih = calculateShiftVariance(nominalFisik, kasSeharusnya);
@@ -111,6 +117,19 @@ export function CloseShiftModal({
               <div className="flex items-start gap-2.5 p-3 rounded-lg bg-destructive/10 text-destructive text-sm border border-destructive/20">
                 <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
                 <span>{errorMessage}</span>
+              </div>
+            )}
+
+            {/* Peringatan Transaksi QRIS Menunggu Pembayaran (PRD Bagian 11.5) */}
+            {pendingCount > 0 && (
+              <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-400 text-sm border border-amber-500/30 animate-in fade-in">
+                <AlertTriangle className="h-5 w-5 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
+                <div className="space-y-0.5">
+                  <p className="font-bold text-sm">Ada {pendingCount} Transaksi QRIS Menunggu Pembayaran</p>
+                  <p className="text-xs text-amber-800/90 dark:text-amber-300/90 leading-relaxed">
+                    Sesuai aturan PRD 11.5, shift tidak dapat ditutup selama masih ada transaksi menggantung. Silakan selesaikan atau batalkan transaksi tersebut di menu Kasir terlebih dahulu.
+                  </p>
+                </div>
               </div>
             )}
 
@@ -216,13 +235,15 @@ export function CloseShiftModal({
             <Button
               type="submit"
               variant="destructive"
-              disabled={isLoading}
+              disabled={isLoading || pendingCount > 0}
             >
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Menutup Shift...
                 </>
+              ) : pendingCount > 0 ? (
+                'Selesaikan Transaksi Terlebih Dahulu'
               ) : (
                 'Konfirmasi Tutup Shift'
               )}
