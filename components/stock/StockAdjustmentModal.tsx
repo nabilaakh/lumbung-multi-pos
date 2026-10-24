@@ -62,6 +62,11 @@ export function StockAdjustmentModal({
     e.preventDefault();
     setError(null);
 
+    if (!item.produk) {
+      setError('Detail produk tidak tersedia sehingga penyesuaian stok tidak dapat dilakukan.');
+      return;
+    }
+
     const fullReason =
       presetReason === 'Lainnya'
         ? keterangan.trim()
@@ -105,43 +110,51 @@ export function StockAdjustmentModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md bg-white border border-slate-200">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <div className="flex items-center gap-2">
-            <PackageOpen className="w-5 h-5 text-amber-600" />
-            <DialogTitle className="text-lg font-bold text-slate-800">
+            <PackageOpen className="w-5 h-5 text-primary" />
+            <DialogTitle className="text-lg font-bold text-foreground">
               Penyesuaian Stok Cabang
             </DialogTitle>
           </div>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-muted-foreground">
             Aksi ini dicatat dalam Audit Log sistem secara permanen (BR-12).
           </p>
         </DialogHeader>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-xs flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 shrink-0 text-red-500" />
+          <div className="bg-destructive/10 border border-destructive/20 text-destructive p-3 rounded-lg text-xs flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 shrink-0 text-destructive" />
             <span>{error}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-1">
+          <div className="bg-muted/50 p-3 rounded-lg border border-border space-y-1">
             <div className="flex justify-between items-center">
-              <span className="text-xs font-semibold text-slate-500">Produk</span>
+              <span className="text-xs font-semibold text-muted-foreground">Produk</span>
               <Badge variant="outline" className="font-mono text-xs">
-                {item.produk.sku}
+                {item.produk?.sku ?? '-'}
               </Badge>
             </div>
-            <div className="font-semibold text-sm text-slate-800">{item.produk.nama}</div>
-            <div className="flex justify-between text-xs text-slate-600 pt-1">
-              <span>Cabang: <strong className="text-slate-800">{item.cabang?.nama || item.cabang_id}</strong></span>
-              <span>Stok Saat Ini: <strong className="text-slate-800">{item.jumlah}</strong></span>
+            <div className="font-semibold text-sm text-foreground">
+              {item.produk?.nama ?? 'Produk tidak tersedia / nonaktif'}
+            </div>
+            {!item.produk && (
+              <p className="text-[11px] text-amber-700 dark:text-amber-400">
+                Detail produk tidak dapat diakses (kemungkinan produk nonaktif). Penyesuaian stok
+                dinonaktifkan.
+              </p>
+            )}
+            <div className="flex justify-between text-xs text-muted-foreground pt-1">
+              <span>Cabang: <strong className="text-foreground">{item.cabang?.nama || item.cabang_id}</strong></span>
+              <span>Stok Saat Ini: <strong className="text-foreground">{item.jumlah}</strong></span>
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-700">Jumlah Stok Baru</label>
+            <label className="text-xs font-semibold text-foreground">Jumlah Stok Baru</label>
             <div className="flex items-center gap-3">
               <Input
                 type="number"
@@ -153,15 +166,15 @@ export function StockAdjustmentModal({
               />
               <div className="text-xs font-semibold shrink-0">
                 {selisih > 0 ? (
-                  <span className="text-emerald-600 bg-emerald-50 px-2.5 py-1.5 rounded-md border border-emerald-200">
+                  <span className="text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2.5 py-1.5 rounded-md border border-emerald-200 dark:border-emerald-900">
                     +{selisih} unit
                   </span>
                 ) : selisih < 0 ? (
-                  <span className="text-rose-600 bg-rose-50 px-2.5 py-1.5 rounded-md border border-rose-200">
+                  <span className="text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/30 px-2.5 py-1.5 rounded-md border border-rose-200 dark:border-rose-900">
                     {selisih} unit
                   </span>
                 ) : (
-                  <span className="text-slate-500 bg-slate-100 px-2.5 py-1.5 rounded-md border border-slate-200">
+                  <span className="text-muted-foreground bg-muted px-2.5 py-1.5 rounded-md border border-border">
                     Tidak berubah
                   </span>
                 )}
@@ -170,11 +183,11 @@ export function StockAdjustmentModal({
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-700">Kategori Penyesuaian</label>
+            <label className="text-xs font-semibold text-foreground">Kategori Penyesuaian</label>
             <select
               value={presetReason}
               onChange={(e) => setPresetReason(e.target.value)}
-              className="w-full h-10 px-3 rounded-md border border-slate-300 bg-white text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
+              className="w-full h-10 px-3 rounded-md border border-border bg-card text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             >
               {REASON_PRESETS.map((p) => (
                 <option key={p} value={p}>
@@ -185,7 +198,7 @@ export function StockAdjustmentModal({
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-700">
+            <label className="text-xs font-semibold text-foreground">
               Keterangan Alasan {presetReason === 'Lainnya' ? '(Wajib)' : '(Opsional)'}
             </label>
             <Input
@@ -212,8 +225,8 @@ export function StockAdjustmentModal({
             <Button
               type="submit"
               size="sm"
-              disabled={loading || (selisih === 0 && jumlahBaru === item.jumlah)}
-              className="bg-amber-600 hover:bg-amber-700 text-white text-xs gap-1.5"
+              disabled={loading || !item.produk || (selisih === 0 && jumlahBaru === item.jumlah)}
+              className="text-xs gap-1.5"
             >
               {loading ? (
                 <>

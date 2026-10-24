@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { AlertCircle, LockKeyhole, Calculator, AlertTriangle } from 'lucide-react';
+import { AlertCircle, LockKeyhole, Calculator, AlertTriangle, Loader2 } from 'lucide-react';
 
 interface CloseShiftModalProps {
   shift: ShiftKasir;
@@ -124,13 +124,13 @@ export function CloseShiftModal({
               </div>
               <div>
                 <span className="text-muted-foreground">Penjualan Tunai Lunas:</span>
-                <p className="font-semibold text-emerald-600 text-sm">
+                <p className="font-semibold text-emerald-600 dark:text-emerald-400 text-sm">
                   + Rp{totalTunai.toLocaleString('id-ID')}
                 </p>
               </div>
               <div>
                 <span className="text-muted-foreground">Penjualan QRIS (Non-Kas):</span>
-                <p className="font-semibold text-blue-600 text-sm">
+                <p className="font-semibold text-blue-600 dark:text-blue-400 text-sm">
                   Rp{totalQris.toLocaleString('id-ID')}
                 </p>
               </div>
@@ -171,7 +171,7 @@ export function CloseShiftModal({
                   ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-500/30 text-emerald-700 dark:text-emerald-300'
                   : isToleranceExceeded
                   ? 'bg-destructive/10 border-destructive/30 text-destructive'
-                  : 'bg-amber-50 dark:bg-amber-950/20 border-amber-500/30 text-amber-700 dark:text-amber-300'
+                  : 'bg-primary/10 border-primary/30 text-primary'
               }`}
             >
               <span className="font-medium">Selisih Kas:</span>
@@ -218,7 +218,14 @@ export function CloseShiftModal({
               variant="destructive"
               disabled={isLoading}
             >
-              {isLoading ? 'Menutup Shift...' : 'Konfirmasi Tutup Shift'}
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Menutup Shift...
+                </>
+              ) : (
+                'Konfirmasi Tutup Shift'
+              )}
             </Button>
           </DialogFooter>
         </form>

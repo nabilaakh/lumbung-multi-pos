@@ -15,6 +15,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AlertCircle, Clock, ShoppingCart, ArrowRight } from 'lucide-react';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function KasirPOSPage() {
   const supabase = createClient();
@@ -219,14 +220,7 @@ export default function KasirPOSPage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="flex flex-col items-center gap-2 text-muted-foreground text-sm">
-          <Clock className="h-6 w-6 animate-spin text-primary" />
-          <span>Memuat sistem kasir POS...</span>
-        </div>
-      </div>
-    );
+    return <LoadingState fullScreen label="Memuat sistem kasir POS..." />;
   }
 
   // BR-02: Kasir WAJIB memiliki shift aktif 'buka' untuk melayani pesanan

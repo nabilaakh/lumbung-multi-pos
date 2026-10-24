@@ -34,19 +34,13 @@ export function ShiftSummaryCard({ shift, totalTunaiLive, totalQrisLive }: Shift
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Badge
-              variant={
-                shift.status === 'buka'
-                  ? 'default'
-                  : shift.status === 'diverifikasi'
-                  ? 'outline'
-                  : 'secondary'
-              }
+              variant="outline"
               className={
                 shift.status === 'buka'
-                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                  ? 'bg-blue-100 text-blue-800 border-blue-300 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800'
                   : shift.status === 'diverifikasi'
-                  ? 'border-purple-600 text-purple-700 bg-purple-50 dark:bg-purple-950/30'
-                  : 'bg-amber-600 text-white'
+                  ? 'bg-emerald-100 text-emerald-800 border-emerald-300 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800'
+                  : 'bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800'
               }
             >
               {shift.status === 'buka' ? '● Sedang Buka' : shift.status === 'ditutup' ? 'Ditutup (Menunggu Verifikasi)' : 'Diverifikasi'}
@@ -68,7 +62,7 @@ export function ShiftSummaryCard({ shift, totalTunaiLive, totalQrisLive }: Shift
       <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-4 rounded-xl bg-muted/40 border border-border/50">
           <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium mb-1">
-            <Wallet className="h-4 w-4 text-amber-600" />
+            <Wallet className="h-4 w-4 text-primary" />
             <span>Kas Awal di Laci</span>
           </div>
           <p className="text-2xl font-bold tracking-tight text-foreground">
@@ -78,7 +72,7 @@ export function ShiftSummaryCard({ shift, totalTunaiLive, totalQrisLive }: Shift
 
         <div className="p-4 rounded-xl bg-muted/40 border border-border/50">
           <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium mb-1">
-            <ArrowDownRight className="h-4 w-4 text-emerald-600" />
+            <ArrowDownRight className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             <span>Penjualan Tunai Lunas</span>
           </div>
           <p className="text-2xl font-bold tracking-tight text-emerald-700 dark:text-emerald-400">
@@ -88,7 +82,7 @@ export function ShiftSummaryCard({ shift, totalTunaiLive, totalQrisLive }: Shift
 
         <div className="p-4 rounded-xl bg-muted/40 border border-border/50">
           <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium mb-1">
-            <CreditCard className="h-4 w-4 text-blue-600" />
+            <CreditCard className="h-4 w-4 text-blue-600 dark:text-blue-400" />
             <span>Penjualan QRIS Lunas</span>
           </div>
           <p className="text-2xl font-bold tracking-tight text-blue-700 dark:text-blue-400">
@@ -96,12 +90,12 @@ export function ShiftSummaryCard({ shift, totalTunaiLive, totalQrisLive }: Shift
           </p>
         </div>
 
-        <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30">
-          <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300 text-xs font-semibold mb-1">
+        <div className="p-4 rounded-xl bg-primary/10 border border-primary/30">
+          <div className="flex items-center gap-2 text-primary text-xs font-semibold mb-1">
             <CheckCircle2 className="h-4 w-4" />
             <span>Kas Tunai Seharusnya</span>
           </div>
-          <p className="text-2xl font-extrabold tracking-tight text-amber-900 dark:text-amber-200">
+          <p className="text-2xl font-extrabold tracking-tight text-primary">
             Rp{kasSeharusnya.toLocaleString('id-ID')}
           </p>
         </div>
@@ -119,10 +113,10 @@ export function ShiftSummaryCard({ shift, totalTunaiLive, totalQrisLive }: Shift
               <p
                 className={`text-lg font-bold ${
                   (shift.selisih ?? 0) === 0
-                    ? 'text-emerald-600'
+                    ? 'text-emerald-600 dark:text-emerald-400'
                     : (shift.selisih ?? 0) < 0
                     ? 'text-destructive'
-                    : 'text-amber-600'
+                    : 'text-primary'
                 }`}
               >
                 {(shift.selisih ?? 0) > 0 ? '+' : ''}

@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { StockItem, isLowStock } from '@/lib/services/stock-service';
 import { StockAdjustmentModal } from './StockAdjustmentModal';
+import { LoadingState } from '@/components/ui/loading-state';
 import {
   Search,
   AlertTriangle,
@@ -95,14 +96,14 @@ export function StockTable({
     <div className="space-y-4">
       {/* Top Banner if low stock items exist */}
       {lowStockCount > 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between text-amber-900 shadow-sm">
+        <div className="bg-amber-50 dark:bg-amber-950/25 border border-amber-200 dark:border-amber-900 rounded-xl p-4 flex items-center justify-between text-amber-900 dark:text-amber-200 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-amber-100 rounded-lg text-amber-700">
+            <div className="p-2 bg-amber-100 dark:bg-amber-950/50 rounded-lg text-amber-700 dark:text-amber-400">
               <AlertTriangle className="w-5 h-5" />
             </div>
             <div>
               <h4 className="text-sm font-bold">Peringatan Stok Menipis (BR-09)</h4>
-              <p className="text-xs text-amber-800">
+              <p className="text-xs text-amber-800 dark:text-amber-300">
                 Terdapat <strong>{lowStockCount} item</strong> dengan jumlah stok di bawah atau sama dengan batas minimum.
               </p>
             </div>
@@ -111,10 +112,10 @@ export function StockTable({
             size="sm"
             variant="outline"
             onClick={() => setFilterLowStockOnly(!filterLowStockOnly)}
-            className={`text-xs border-amber-300 font-semibold ${
+            className={`text-xs border-amber-300 dark:border-amber-800 font-semibold ${
               filterLowStockOnly
                 ? 'bg-amber-600 text-white hover:bg-amber-700'
-                : 'text-amber-800 hover:bg-amber-100'
+                : 'text-amber-800 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-950/40'
             }`}
           >
             {filterLowStockOnly ? 'Tampilkan Semua Stok' : 'Lihat Stok Menipis Saja'}
@@ -123,23 +124,23 @@ export function StockTable({
       )}
 
       {/* Filter and Search Bar */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+      <div className="bg-card p-4 rounded-xl border border-border shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
         <div className="flex flex-1 items-center gap-2">
           <div className="relative flex-1 max-w-sm">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
             <Input
               type="text"
               placeholder="Cari nama produk atau SKU..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 text-xs h-9 bg-slate-50 border-slate-200"
+              className="pl-9 text-xs h-9 bg-muted/50 border-border"
             />
           </div>
 
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="h-9 px-3 rounded-md border border-slate-200 bg-slate-50 text-xs text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-amber-500"
+            className="h-9 px-3 rounded-md border border-border bg-muted/50 text-xs text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-primary"
           >
             {CATEGORIES.map((c) => (
               <option key={c.id} value={c.id}>
@@ -150,12 +151,12 @@ export function StockTable({
 
           {/* Branch filter: only Owner can switch, Kepala Toko is locked */}
           {userRole === 'owner' ? (
-            <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200">
-              <Building2 className="w-3.5 h-3.5 text-slate-400" />
+            <div className="flex items-center gap-1.5 bg-muted/50 px-2.5 py-1 rounded-md border border-border">
+              <Building2 className="w-3.5 h-3.5 text-muted-foreground" />
               <select
                 value={selectedCabang}
                 onChange={(e) => setSelectedCabang(e.target.value)}
-                className="bg-transparent text-xs text-slate-700 font-medium focus:outline-none"
+                className="bg-transparent text-xs text-foreground font-medium focus:outline-none"
               >
                 <option value="all">Semua Cabang</option>
                 {cabangList.map((c) => (
@@ -166,8 +167,8 @@ export function StockTable({
               </select>
             </div>
           ) : (
-            <div className="flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-md text-xs font-semibold text-slate-700 border border-slate-200">
-              <Building2 className="w-3.5 h-3.5 text-slate-500" />
+            <div className="flex items-center gap-1.5 bg-muted px-3 py-1.5 rounded-md text-xs font-semibold text-foreground border border-border">
+              <Building2 className="w-3.5 h-3.5 text-muted-foreground" />
               Cabang: {cabangList.find((c) => c.id === userCabangId)?.nama || 'Cabang Saya'}
             </div>
           )}
@@ -179,7 +180,7 @@ export function StockTable({
             size="sm"
             onClick={onRefresh}
             disabled={loading}
-            className="text-xs h-9 gap-1.5 text-slate-600"
+            className="text-xs h-9 gap-1.5 text-muted-foreground"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             Refresh
@@ -188,24 +189,30 @@ export function StockTable({
       </div>
 
       {/* Stock Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
         <Table>
-          <TableHeader className="bg-slate-50">
+          <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead className="text-xs font-bold text-slate-600">SKU</TableHead>
-              <TableHead className="text-xs font-bold text-slate-600">Nama Produk</TableHead>
-              <TableHead className="text-xs font-bold text-slate-600">Kategori</TableHead>
-              <TableHead className="text-xs font-bold text-slate-600">Cabang</TableHead>
-              <TableHead className="text-xs font-bold text-slate-600 text-right">Stok Fisik</TableHead>
-              <TableHead className="text-xs font-bold text-slate-600 text-right">Batas Min</TableHead>
-              <TableHead className="text-xs font-bold text-slate-600 text-center">Status</TableHead>
-              <TableHead className="text-xs font-bold text-slate-600 text-right">Aksi</TableHead>
+              <TableHead className="text-xs font-bold text-muted-foreground">SKU</TableHead>
+              <TableHead className="text-xs font-bold text-muted-foreground">Nama Produk</TableHead>
+              <TableHead className="text-xs font-bold text-muted-foreground">Kategori</TableHead>
+              <TableHead className="text-xs font-bold text-muted-foreground">Cabang</TableHead>
+              <TableHead className="text-xs font-bold text-muted-foreground text-right">Stok Fisik</TableHead>
+              <TableHead className="text-xs font-bold text-muted-foreground text-right">Batas Min</TableHead>
+              <TableHead className="text-xs font-bold text-muted-foreground text-center">Status</TableHead>
+              <TableHead className="text-xs font-bold text-muted-foreground text-right">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredItems.length === 0 ? (
+            {loading ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-8 text-xs text-slate-500">
+                <TableCell colSpan={8} className="p-0">
+                  <LoadingState label="Memuat data inventaris stok..." />
+                </TableCell>
+              </TableRow>
+            ) : filteredItems.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-8 text-xs text-muted-foreground">
                   Tidak ada data stok yang sesuai dengan filter.
                 </TableCell>
               </TableRow>
@@ -213,64 +220,67 @@ export function StockTable({
               filteredItems.map((item) => {
                 const isWarning = isLowStock(item.jumlah, item.stok_minimum);
                 const canAdjust =
-                  userRole === 'owner' ||
-                  (userRole === 'kepala_toko' && item.cabang_id === userCabangId);
+                  !!item.produk &&
+                  (userRole === 'owner' ||
+                    (userRole === 'kepala_toko' && item.cabang_id === userCabangId));
 
                 return (
                   <TableRow
                     key={item.id}
-                    className={`hover:bg-slate-50/80 transition-colors ${
-                      isWarning ? 'bg-amber-50/40' : ''
+                    className={`hover:bg-muted/40 transition-colors ${
+                      isWarning ? 'bg-amber-50/40 dark:bg-amber-950/20' : ''
                     }`}
                   >
-                    <TableCell className="font-mono text-xs font-semibold text-slate-700">
-                      {item?.produk?.sku}
+                    <TableCell className="font-mono text-xs font-semibold text-foreground">
+                      {item.produk?.sku ?? '-'}
                     </TableCell>
-                    <TableCell className="text-xs font-semibold text-slate-800">
-                      <div>{item.produk.nama}</div>
-                      <span className="text-[10px] text-slate-500 font-normal">
-                        Rp {item.produk.harga_jual.toLocaleString('id-ID')}
+                    <TableCell className="text-xs font-semibold text-foreground">
+                      <div>{item.produk?.nama ?? 'Produk tidak tersedia / nonaktif'}</div>
+                      <span className="text-[10px] text-muted-foreground font-normal">
+                        {item.produk
+                          ? `Rp ${item.produk.harga_jual.toLocaleString('id-ID')}`
+                          : 'Harga tidak tersedia'}
                       </span>
                     </TableCell>
                     <TableCell>
                       <Badge
                         variant="secondary"
-                        className="text-[10px] font-semibold uppercase tracking-wider bg-slate-100 text-slate-600"
+                        className="text-[10px] font-semibold uppercase tracking-wider bg-muted text-muted-foreground"
                       >
-                        {item.produk.kategori}
+                        {item.produk?.kategori ?? '-'}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-xs text-slate-700">
-                      <span className="font-bold text-slate-800">{item.cabang?.kode}</span> -{' '}
+                    <TableCell className="text-xs text-foreground">
+                      <span className="font-bold text-foreground">{item.cabang?.kode}</span> -{' '}
                       {item.cabang?.nama}
                     </TableCell>
                     <TableCell className="text-right">
                       <span
                         className={`font-mono text-sm font-bold ${
                           item.jumlah === 0
-                            ? 'text-rose-600'
+                            ? 'text-rose-600 dark:text-rose-400'
                             : isWarning
-                            ? 'text-amber-600'
-                            : 'text-slate-800'
+                            ? 'text-amber-600 dark:text-amber-400'
+                            : 'text-foreground'
                         }`}
                       >
                         {item.jumlah}
                       </span>
                     </TableCell>
-                    <TableCell className="text-right font-mono text-xs text-slate-500">
+                    <TableCell className="text-right font-mono text-xs text-muted-foreground">
                       {item.stok_minimum}
                     </TableCell>
                     <TableCell className="text-center">
                       {item.jumlah === 0 ? (
-                        <Badge className="bg-rose-100 text-rose-700 border-rose-300 text-[10px] hover:bg-rose-100">
+                        <Badge className="bg-rose-100 text-rose-700 border-rose-300 text-[10px] hover:bg-rose-100 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 dark:hover:bg-rose-950/50">
                           Habis
                         </Badge>
                       ) : isWarning ? (
-                        <Badge className="bg-amber-100 text-amber-800 border-amber-300 text-[10px] hover:bg-amber-100">
+                        <Badge className="bg-amber-100 text-amber-800 border-amber-300 text-[10px] hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800 dark:hover:bg-amber-950/50">
                           Menipis (≤ Min)
                         </Badge>
                       ) : (
-                        <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-[10px] hover:bg-emerald-100">
+                        <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-[10px] hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 dark:hover:bg-emerald-950/50">
                           Aman
                         </Badge>
                       )}
@@ -281,13 +291,15 @@ export function StockTable({
                           size="sm"
                           variant="outline"
                           onClick={() => setSelectedItemForAdjustment(item)}
-                          className="text-xs h-8 border-slate-300 hover:border-amber-500 hover:text-amber-700 font-semibold"
+                          className="text-xs h-8 border-border hover:border-primary hover:text-primary font-semibold"
                         >
-                          <SlidersHorizontal className="w-3.5 h-3.5 mr-1 text-slate-500" />
+                          <SlidersHorizontal className="w-3.5 h-3.5 mr-1 text-muted-foreground" />
                           Sesuaikan
                         </Button>
                       ) : (
-                        <span className="text-[11px] text-slate-400 italic">Terkunci</span>
+                        <span className="text-[11px] text-muted-foreground italic">
+                          {item.produk ? 'Terkunci' : 'Tidak tersedia'}
+                        </span>
                       )}
                     </TableCell>
                   </TableRow>

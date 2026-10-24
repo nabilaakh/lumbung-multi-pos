@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { AuditLogEntry } from '@/lib/services/settings-service';
+import { LoadingState } from '@/components/ui/loading-state';
 import { Search, ShieldAlert, History, User, RefreshCw } from 'lucide-react';
 
 interface AuditLogTableProps {
@@ -43,19 +44,19 @@ export function AuditLogTable({ logs, onRefresh, loading = false }: AuditLogTabl
     switch (aksi) {
       case 'void_transaksi':
         return (
-          <Badge className="bg-rose-100 text-rose-800 border-rose-300 text-[10px] hover:bg-rose-100">
+          <Badge className="bg-rose-100 text-rose-800 border-rose-300 text-[10px] hover:bg-rose-100 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 dark:hover:bg-rose-950/50">
             Void Transaksi
           </Badge>
         );
       case 'penyesuaian_stok':
         return (
-          <Badge className="bg-amber-100 text-amber-800 border-amber-300 text-[10px] hover:bg-amber-100">
+          <Badge className="bg-primary/10 text-primary border-primary/20 text-[10px] hover:bg-primary/10">
             Penyesuaian Stok
           </Badge>
         );
       case 'verifikasi_shift':
         return (
-          <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-[10px] hover:bg-emerald-100">
+          <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-[10px] hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 dark:hover:bg-emerald-950/50">
             Verifikasi Shift
           </Badge>
         );
@@ -71,23 +72,23 @@ export function AuditLogTable({ logs, onRefresh, loading = false }: AuditLogTabl
   return (
     <div className="space-y-4">
       {/* Search and Action Filter */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+      <div className="bg-card p-4 rounded-xl border border-border shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
         <div className="flex flex-1 items-center gap-2.5 flex-wrap">
           <div className="relative flex-1 max-w-sm">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
             <Input
               type="text"
               placeholder="Cari pelaku, aksi, atau tabel..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 text-xs h-9 bg-slate-50 border-slate-200"
+              className="pl-9 text-xs h-9 bg-muted/50 border-border"
             />
           </div>
 
           <select
             value={actionFilter}
             onChange={(e) => setActionFilter(e.target.value)}
-            className="h-9 px-3 rounded-md border border-slate-200 bg-slate-50 text-xs text-slate-700 font-medium focus:outline-none"
+            className="h-9 px-3 rounded-md border border-border bg-muted/50 text-xs text-foreground font-medium focus:outline-none"
           >
             <option value="all">Semua Jenis Aksi Audit</option>
             <option value="penyesuaian_stok">Penyesuaian Stok</option>
@@ -101,7 +102,7 @@ export function AuditLogTable({ logs, onRefresh, loading = false }: AuditLogTabl
           size="sm"
           onClick={onRefresh}
           disabled={loading}
-          className="text-xs h-9 gap-1.5 text-slate-600"
+          className="text-xs h-9 gap-1.5 text-muted-foreground"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
           Refresh Log
@@ -109,46 +110,52 @@ export function AuditLogTable({ logs, onRefresh, loading = false }: AuditLogTabl
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
         <Table>
-          <TableHeader className="bg-slate-50">
+          <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead className="text-xs font-bold text-slate-600">Waktu Kejadian</TableHead>
-              <TableHead className="text-xs font-bold text-slate-600">Pelaku</TableHead>
-              <TableHead className="text-xs font-bold text-slate-600">Aksi Sistem (BR-12)</TableHead>
-              <TableHead className="text-xs font-bold text-slate-600">Tabel Terkait</TableHead>
-              <TableHead className="text-xs font-bold text-slate-600">Perubahan / Alasan</TableHead>
+              <TableHead className="text-xs font-bold text-muted-foreground">Waktu Kejadian</TableHead>
+              <TableHead className="text-xs font-bold text-muted-foreground">Pelaku</TableHead>
+              <TableHead className="text-xs font-bold text-muted-foreground">Aksi Sistem (BR-12)</TableHead>
+              <TableHead className="text-xs font-bold text-muted-foreground">Tabel Terkait</TableHead>
+              <TableHead className="text-xs font-bold text-muted-foreground">Perubahan / Alasan</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredLogs.length === 0 ? (
+            {loading ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-xs text-slate-500">
+                <TableCell colSpan={5} className="p-0">
+                  <LoadingState label="Memuat catatan audit log..." />
+                </TableCell>
+              </TableRow>
+            ) : filteredLogs.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-8 text-xs text-muted-foreground">
                   Tidak ada catatan audit log yang sesuai.
                 </TableCell>
               </TableRow>
             ) : (
               filteredLogs.map((log) => (
-                <TableRow key={log.id} className="hover:bg-slate-50/80 transition-colors">
-                  <TableCell className="font-mono text-xs text-slate-600 whitespace-nowrap">
+                <TableRow key={log.id} className="hover:bg-muted/40 transition-colors">
+                  <TableCell className="font-mono text-xs text-muted-foreground whitespace-nowrap">
                     {new Date(log.dibuat_pada).toLocaleString('id-ID')}
                   </TableCell>
-                  <TableCell className="text-xs font-semibold text-slate-800">
+                  <TableCell className="text-xs font-semibold text-foreground">
                     <div>{log.pelaku?.nama_lengkap || 'Sistem / Anon'}</div>
-                    <span className="text-[10px] text-slate-400 uppercase font-mono">
+                    <span className="text-[10px] text-muted-foreground uppercase font-mono">
                       {log.pelaku?.peran || '-'}
                     </span>
                   </TableCell>
                   <TableCell>{getActionBadge(log.aksi)}</TableCell>
-                  <TableCell className="font-mono text-xs text-slate-500">
+                  <TableCell className="font-mono text-xs text-muted-foreground">
                     {log.tabel}
                   </TableCell>
-                  <TableCell className="text-xs text-slate-700">
+                  <TableCell className="text-xs text-foreground">
                     <div className="space-y-1 font-mono text-[11px]">
                       {log.nilai_sesudah && (
-                        <div className="bg-slate-50 p-2 rounded border border-slate-200">
+                        <div className="bg-muted/50 p-2 rounded border border-border">
                           {Boolean(log.nilai_sesudah.alasan) && (
-                            <div className="text-slate-800 font-sans font-semibold mb-1">
+                            <div className="text-foreground font-sans font-semibold mb-1">
                               Alasan:{' '}
                               <span className="font-normal italic">
                                 &ldquo;{String(log.nilai_sesudah.alasan)}&rdquo;
@@ -156,14 +163,14 @@ export function AuditLogTable({ logs, onRefresh, loading = false }: AuditLogTabl
                             </div>
                           )}
                           {Boolean(log.nilai_sesudah.alasan_void) && (
-                            <div className="text-rose-700 font-sans font-semibold mb-1">
+                            <div className="text-rose-700 dark:text-rose-300 font-sans font-semibold mb-1">
                               Alasan Void:{' '}
                               <span className="font-normal italic">
                                 &ldquo;{String(log.nilai_sesudah.alasan_void)}&rdquo;
                               </span>
                             </div>
                           )}
-                          <div className="text-slate-500 text-[10px]">
+                          <div className="text-muted-foreground text-[10px]">
                             State: {JSON.stringify(log.nilai_sesudah)}
                           </div>
                         </div>

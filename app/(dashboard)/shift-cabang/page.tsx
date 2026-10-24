@@ -63,7 +63,7 @@ export default function ShiftCabangPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground font-serif flex items-center gap-2">
-            <ShieldCheck className="w-6 h-6 text-emerald-700" />
+            <ShieldCheck className="w-6 h-6 text-primary" />
             Supervisi Shift Kasir
           </h1>
           <p className="text-sm text-muted-foreground">

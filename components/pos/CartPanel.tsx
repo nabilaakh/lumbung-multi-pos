@@ -219,7 +219,7 @@ export function CartPanel({
               <span>Rp{subtotal.toLocaleString('id-ID')}</span>
             </div>
             {nominalDiskon > 0 && (
-              <div className="flex justify-between text-emerald-600 font-medium">
+              <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-medium">
                 <span>Diskon Terpasang</span>
                 <span>- Rp{nominalDiskon.toLocaleString('id-ID')}</span>
               </div>

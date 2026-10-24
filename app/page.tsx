@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BrandLogo } from "@/components/brand/brand-logo";
 import Link from "next/link";
 
 export default function Page() {
@@ -8,6 +9,9 @@ export default function Page() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-6">
       <Card className="w-full max-w-lg shadow-lg border-border">
         <CardHeader className="text-center">
+          <div className="flex justify-center mb-2">
+            <BrandLogo href={null} showText={false} size="lg" />
+          </div>
           <div className="flex justify-center mb-2">
             <Badge variant="outline" className="text-xs px-2.5 py-0.5">
               Multi-Branch Point of Sale

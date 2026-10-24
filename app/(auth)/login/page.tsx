@@ -8,7 +8,9 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Coffee, Lock, Mail, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { LoadingState } from '@/components/ui/loading-state';
+import { BrandLogo } from '@/components/brand/brand-logo';
+import { Lock, Mail, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 import type { ProfilPengguna } from '@/types/database';
 
 function LoginForm() {
@@ -94,11 +96,9 @@ function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-md border-amber-900/10 shadow-xl bg-card/95 backdrop-blur-sm">
+    <Card className="w-full max-w-md border-primary/10 shadow-xl bg-card/95 backdrop-blur-sm">
       <CardHeader className="space-y-3 text-center pb-6">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-700/10 text-amber-800 dark:text-amber-500 shadow-inner">
-          <Coffee className="h-7 w-7" />
-        </div>
+        <BrandLogo href={null} showText={false} size="lg" className="justify-center" />
         <div>
           <CardTitle className="text-2xl font-bold tracking-tight text-foreground font-serif">
             Lumbung Kopi & Roti
@@ -179,7 +179,14 @@ function LoginForm() {
             className="w-full h-11 text-base font-medium shadow-md transition-all active:scale-[0.99]"
             disabled={isLoading}
           >
-            {isLoading ? 'Memverifikasi...' : 'Masuk ke Aplikasi'}
+            {isLoading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Memverifikasi...
+              </>
+            ) : (
+              'Masuk ke Aplikasi'
+            )}
           </Button>
           <p className="text-center text-xs text-muted-foreground">
             Akses terbatas hanya untuk staf & pengelola Lumbung Kopi dan Roti
@@ -192,12 +199,8 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 bg-gradient-to-br from-amber-900/5 via-background to-stone-900/10">
-      <Suspense fallback={
-        <div className="flex items-center justify-center p-8 text-sm text-muted-foreground">
-          Memuat halaman masuk...
-        </div>
-      }>
+    <div className="min-h-screen w-full flex items-center justify-center p-4 bg-gradient-to-br from-primary/5 via-background to-muted/20">
+      <Suspense fallback={<LoadingState fullScreen label="Memuat halaman masuk..." />}>
         <LoginForm />
       </Suspense>
     </div>

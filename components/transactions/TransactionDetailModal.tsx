@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Printer, Ban, Receipt, Clock, User, Store, AlertCircle } from 'lucide-react';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface TransactionDetailModalProps {
   isOpen: boolean;
@@ -89,7 +90,7 @@ export function TransactionDetailModal({
         <DialogHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/10 text-amber-700">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
                 <Receipt className="h-5 w-5" />
               </div>
               <div>
@@ -116,10 +117,7 @@ export function TransactionDetailModal({
         </DialogHeader>
 
         {isLoading || !transaction ? (
-          <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
-            <Clock className="h-5 w-5 animate-spin mr-2 text-amber-600" />
-            Memuat rincian transaksi...
-          </div>
+          <LoadingState label="Memuat rincian transaksi..." />
         ) : (
           <div className="flex-1 overflow-y-auto space-y-4 py-2 pr-1">
             {/* Metadata Header Transaksi */}
@@ -211,7 +209,7 @@ export function TransactionDetailModal({
                 <span>Rp{transaction.subtotal.toLocaleString('id-ID')}</span>
               </div>
               {transaction.diskon > 0 && (
-                <div className="flex justify-between text-emerald-600 font-medium">
+                <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-medium">
                   <span>Diskon {transaction.alasan_diskon ? `(${transaction.alasan_diskon})` : ''}:</span>
                   <span>- Rp{transaction.diskon.toLocaleString('id-ID')}</span>
                 </div>
@@ -232,7 +230,7 @@ export function TransactionDetailModal({
               </div>
               <div className="flex justify-between text-muted-foreground">
                 <span>Kembalian:</span>
-                <span className="font-semibold text-emerald-600">
+                <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                   Rp{transaction.kembalian.toLocaleString('id-ID')}
                 </span>
               </div>
@@ -264,7 +262,7 @@ export function TransactionDetailModal({
               size="sm"
               onClick={handlePrint}
               disabled={isLoading || !transaction}
-              className="bg-amber-700 hover:bg-amber-800 text-white"
+              className="font-medium"
             >
               <Printer className="h-4 w-4 mr-1.5" />
               Cetak Ulang Struk

@@ -155,7 +155,7 @@ export default function LaporanPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground font-serif flex items-center gap-2">
-            <BarChart className="w-6 h-6 text-amber-700" />
+            <BarChart className="w-6 h-6 text-primary" />
             Laporan & Analitik Penjualan
           </h1>
           <p className="text-sm text-muted-foreground">
@@ -169,7 +169,7 @@ export default function LaporanPage() {
             size="sm"
             onClick={loadData}
             disabled={isLoading}
-            className="text-xs h-9 gap-1.5 text-slate-700"
+            className="text-xs h-9 gap-1.5 text-foreground"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
             Perbarui Data
@@ -178,16 +178,16 @@ export default function LaporanPage() {
       </div>
 
       {/* Filter and Date Bar */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+      <div className="bg-card p-4 rounded-xl border border-border shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
         <div className="flex items-center gap-2 flex-wrap">
           {/* Branch filter */}
           {isOwner ? (
-            <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200">
-              <Building2 className="w-3.5 h-3.5 text-slate-400" />
+            <div className="flex items-center gap-1.5 bg-muted/50 px-2.5 py-1 rounded-md border border-border">
+              <Building2 className="w-3.5 h-3.5 text-muted-foreground" />
               <select
                 value={selectedBranch}
                 onChange={(e) => setSelectedBranch(e.target.value)}
-                className="bg-transparent text-xs text-slate-700 font-semibold focus:outline-none"
+                className="bg-transparent text-xs text-foreground font-semibold focus:outline-none"
               >
                 <option value="all">Semua Cabang (Konsolidasi)</option>
                 {branches.map((b) => (
@@ -198,21 +198,21 @@ export default function LaporanPage() {
               </select>
             </div>
           ) : (
-            <div className="flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-md text-xs font-bold text-slate-700 border border-slate-200">
-              <Building2 className="w-3.5 h-3.5 text-slate-500" />
+            <div className="flex items-center gap-1.5 bg-muted px-3 py-1.5 rounded-md text-xs font-bold text-foreground border border-border">
+              <Building2 className="w-3.5 h-3.5 text-muted-foreground" />
               Cabang: {branchName}
             </div>
           )}
 
           {/* Date presets */}
-          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs">
+          <div className="flex items-center gap-1 bg-muted p-1 rounded-lg border border-border text-xs">
             <button
               type="button"
               onClick={() => handleDatePreset('today')}
               className={`px-2.5 py-1 rounded text-xs font-semibold transition-colors ${
                 datePreset === 'today'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-card text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               Hari Ini
@@ -222,8 +222,8 @@ export default function LaporanPage() {
               onClick={() => handleDatePreset('7days')}
               className={`px-2.5 py-1 rounded text-xs font-semibold transition-colors ${
                 datePreset === '7days'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-card text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               7 Hari
@@ -233,8 +233,8 @@ export default function LaporanPage() {
               onClick={() => handleDatePreset('30days')}
               className={`px-2.5 py-1 rounded text-xs font-semibold transition-colors ${
                 datePreset === '30days'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-card text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               30 Hari
@@ -244,8 +244,8 @@ export default function LaporanPage() {
               onClick={() => handleDatePreset('all')}
               className={`px-2.5 py-1 rounded text-xs font-semibold transition-colors ${
                 datePreset === 'all'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-card text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               Semua
@@ -255,7 +255,7 @@ export default function LaporanPage() {
 
         {/* Custom date range inputs */}
         <div className="flex items-center gap-2 text-xs">
-          <Calendar className="w-3.5 h-3.5 text-slate-400" />
+          <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
           <Input
             type="date"
             value={startDate}
@@ -263,9 +263,9 @@ export default function LaporanPage() {
               setStartDate(e.target.value);
               setDatePreset('all');
             }}
-            className="h-8 text-xs w-32 bg-slate-50"
+            className="h-8 text-xs w-32 bg-muted/50"
           />
-          <span className="text-slate-400">-</span>
+          <span className="text-muted-foreground">-</span>
           <Input
             type="date"
             value={endDate}
@@ -273,7 +273,7 @@ export default function LaporanPage() {
               setEndDate(e.target.value);
               setDatePreset('all');
             }}
-            className="h-8 text-xs w-32 bg-slate-50"
+            className="h-8 text-xs w-32 bg-muted/50"
           />
         </div>
       </div>

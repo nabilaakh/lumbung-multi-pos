@@ -71,7 +71,7 @@ export default function PengaturanPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground font-serif flex items-center gap-2">
-            <Settings className="w-6 h-6 text-slate-700" />
+            <Settings className="w-6 h-6 text-primary" />
             Pengaturan Sistem & Audit
           </h1>
           <p className="text-sm text-muted-foreground">
@@ -82,7 +82,7 @@ export default function PengaturanPage() {
 
       {/* Tabs Layout */}
       <Tabs defaultValue="staff" className="space-y-4">
-        <TabsList className="bg-slate-100 p-1 border border-slate-200">
+        <TabsList className="bg-muted p-1 border border-border">
           <TabsTrigger value="staff" className="text-xs font-semibold gap-1.5">
             <Users className="w-3.5 h-3.5" />
             Manajemen Akun Staf

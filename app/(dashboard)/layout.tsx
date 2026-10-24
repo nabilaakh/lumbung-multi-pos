@@ -3,9 +3,9 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { SignOutButton } from '@/components/auth/SignOutButton';
+import { BrandLogo } from '@/components/brand/brand-logo';
 import { Badge } from '@/components/ui/badge';
 import {
-  Coffee,
   ShoppingCart,
   Clock,
   Receipt,
@@ -121,12 +121,7 @@ export default async function DashboardLayout({
         <div className="container mx-auto px-4 lg:px-6 h-16 flex items-center justify-between">
           {/* Logo & Cabang Tag */}
           <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2.5 font-bold tracking-tight text-foreground font-serif text-lg">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-700/10 text-amber-800 dark:text-amber-500">
-                <Coffee className="h-5 w-5" />
-              </div>
-              <span className="hidden sm:inline">Lumbung MultiPOS</span>
-            </Link>
+            <BrandLogo href="/" textClassName="hidden sm:inline" />
 
             {cabangInfo ? (
               <Badge variant="outline" className="font-semibold text-xs px-2.5 py-0.5">

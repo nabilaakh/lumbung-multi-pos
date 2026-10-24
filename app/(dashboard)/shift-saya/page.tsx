@@ -13,6 +13,7 @@ import { CloseShiftModal } from '@/components/shift/CloseShiftModal';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Clock, History, AlertCircle, ShoppingBag } from 'lucide-react';
+import { LoadingState } from '@/components/ui/loading-state';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
@@ -80,14 +81,7 @@ export default function ShiftSayaPage() {
   }, [loadShiftData]);
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="flex flex-col items-center gap-2 text-muted-foreground text-sm">
-          <Clock className="h-6 w-6 animate-spin text-amber-600" />
-          <span>Memuat data sesi shift...</span>
-        </div>
-      </div>
-    );
+    return <LoadingState fullScreen label="Memuat data sesi shift..." />;
   }
 
   if (!profile) {
@@ -122,13 +116,13 @@ export default function ShiftSayaPage() {
                 onShiftOpened={loadShiftData}
               />
             ) : (
-              <Badge variant="outline" className="text-xs p-2 text-amber-700">
+              <Badge variant="outline" className="text-xs p-2 text-primary">
                 Akun belum dialokasikan ke cabang kasir tertentu
               </Badge>
             )
           ) : (
             <div className="flex items-center gap-2.5">
-              <Button asChild className="h-11 px-5 shadow-sm bg-amber-700 hover:bg-amber-800 text-white">
+              <Button asChild className="h-11 px-5 shadow-sm font-medium">
                 <Link href="/kasir">
                   <ShoppingBag className="h-4 w-4 mr-2" />
                   Mulai Kasir POS
@@ -157,7 +151,7 @@ export default function ShiftSayaPage() {
       ) : (
         <Card className="border-dashed border-2 border-border/80 bg-muted/20">
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="h-14 w-14 rounded-2xl bg-amber-500/10 text-amber-700 dark:text-amber-400 flex items-center justify-center mb-4">
+            <div className="h-14 w-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4">
               <Clock className="h-7 w-7" />
             </div>
             <h3 className="text-lg font-semibold text-foreground">Tidak Ada Shift Aktif</h3>
@@ -206,10 +200,10 @@ export default function ShiftSayaPage() {
                         variant="outline"
                         className={
                           sh.status === 'buka'
-                            ? 'text-emerald-600 border-emerald-300'
+                            ? 'text-blue-700 border-blue-300 bg-blue-50 dark:text-blue-300 dark:border-blue-800 dark:bg-blue-950/30'
                             : sh.status === 'diverifikasi'
-                            ? 'text-purple-600 border-purple-300'
-                            : 'text-amber-600 border-amber-300'
+                            ? 'text-emerald-700 border-emerald-300 bg-emerald-50 dark:text-emerald-300 dark:border-emerald-800 dark:bg-emerald-950/30'
+                            : 'text-amber-700 border-amber-300 bg-amber-50 dark:text-amber-300 dark:border-amber-800 dark:bg-amber-950/30'
                         }
                       >
                         {sh.status}
@@ -232,7 +226,7 @@ export default function ShiftSayaPage() {
                     </div>
                     <div>
                       <span className="text-muted-foreground">Selisih:</span>
-                      <p className={`font-medium ${(sh.selisih ?? 0) === 0 ? 'text-emerald-600' : 'text-destructive'}`}>
+                      <p className={`font-medium ${(sh.selisih ?? 0) === 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'}`}>
                         Rp{(sh.selisih ?? 0).toLocaleString('id-ID')}
                       </p>
                     </div>

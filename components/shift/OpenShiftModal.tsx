@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { AlertCircle, PlayCircle, Wallet } from 'lucide-react';
+import { AlertCircle, Loader2, PlayCircle, Wallet } from 'lucide-react';
 
 interface OpenShiftModalProps {
   cashierId: string;
@@ -66,7 +66,7 @@ export function OpenShiftModal({ cashierId, cabangId, onShiftOpened }: OpenShift
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="h-11 px-6 shadow-md bg-emerald-600 hover:bg-emerald-700 text-white font-medium">
+        <Button className="h-11 px-6 shadow-md font-medium">
           <PlayCircle className="h-5 w-5 mr-2" />
           Buka Sesi Shift Baru
         </Button>
@@ -75,7 +75,7 @@ export function OpenShiftModal({ cashierId, cabangId, onShiftOpened }: OpenShift
       <DialogContent className="sm:max-w-md">
         <form onSubmit={handleOpenShift}>
           <DialogHeader>
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 mb-2">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary mb-2">
               <Wallet className="h-6 w-6" />
             </div>
             <DialogTitle className="text-xl">Buka Sesi Shift Kasir</DialogTitle>
@@ -157,9 +157,15 @@ export function OpenShiftModal({ cashierId, cabangId, onShiftOpened }: OpenShift
             <Button
               type="submit"
               disabled={isLoading}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white"
             >
-              {isLoading ? 'Membuka Shift...' : 'Buka Shift Sekarang'}
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Membuka Shift...
+                </>
+              ) : (
+                'Buka Shift Sekarang'
+              )}
             </Button>
           </DialogFooter>
         </form>

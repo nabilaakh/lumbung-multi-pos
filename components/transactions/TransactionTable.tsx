@@ -80,7 +80,7 @@ export function TransactionTable({
               variant={statusFilter === 'lunas' ? 'default' : 'ghost'}
               size="sm"
               onClick={() => setStatusFilter('lunas')}
-              className="h-7 text-xs px-2.5 text-emerald-600"
+              className="h-7 text-xs px-2.5 text-emerald-600 dark:text-emerald-400"
             >
               Lunas
             </Button>

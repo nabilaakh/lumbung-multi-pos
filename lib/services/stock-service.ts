@@ -15,7 +15,7 @@ export interface StockItem {
     harga_jual: number;
     aktif: boolean;
     satuan?: string;
-  };
+  } | null;
   cabang?: {
     id: string;
     kode: string;

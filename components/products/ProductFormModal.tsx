@@ -144,22 +144,22 @@ export function ProductFormModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md bg-white border border-slate-200">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <div className="flex items-center gap-2">
-            <Package className="w-5 h-5 text-amber-700" />
-            <DialogTitle className="text-base font-bold text-slate-800">
+            <Package className="w-5 h-5 text-primary" />
+            <DialogTitle className="text-base font-bold text-foreground">
               {isEditing ? 'Ubah Master Produk' : 'Tambah Produk Baru'}
             </DialogTitle>
           </div>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-muted-foreground">
             Kelola data katalog produk untuk transaksi POS dan perhitungan margin.
           </p>
         </DialogHeader>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-xs flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 shrink-0 text-red-500" />
+          <div className="bg-destructive/10 border border-destructive/20 text-destructive p-3 rounded-lg text-xs flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 shrink-0 text-destructive" />
             <span>{error}</span>
           </div>
         )}
@@ -167,7 +167,7 @@ export function ProductFormModal({
         <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
           <div className="grid grid-cols-3 gap-2">
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">SKU / Kode</label>
+              <label className="font-semibold text-foreground">SKU / Kode</label>
               <Input
                 type="text"
                 placeholder="KOP-001"
@@ -178,7 +178,7 @@ export function ProductFormModal({
               />
             </div>
             <div className="col-span-2 space-y-1">
-              <label className="font-semibold text-slate-700">Nama Produk</label>
+              <label className="font-semibold text-foreground">Nama Produk</label>
               <Input
                 type="text"
                 placeholder="Espresso Single"
@@ -192,11 +192,11 @@ export function ProductFormModal({
 
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Kategori (BR-01)</label>
+              <label className="font-semibold text-foreground">Kategori (BR-01)</label>
               <select
                 value={kategori}
                 onChange={(e) => setKategori(e.target.value as ProductCategory)}
-                className="w-full h-9 px-3 rounded-md border border-slate-300 bg-white text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="w-full h-9 px-3 rounded-md border border-border bg-card text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 {PRODUCT_CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>
@@ -207,7 +207,7 @@ export function ProductFormModal({
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Harga Jual (Rp)</label>
+              <label className="font-semibold text-foreground">Harga Jual (Rp)</label>
               <Input
                 type="number"
                 min="0"
@@ -221,13 +221,13 @@ export function ProductFormModal({
 
           {/* Owner Only: Harga Modal (BR-11) */}
           {isOwner && (
-            <div className="p-3 bg-amber-50/70 border border-amber-200 rounded-lg space-y-1.5">
+            <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="font-bold text-amber-950 flex items-center gap-1.5 text-xs">
-                  <Lock className="w-3.5 h-3.5 text-amber-700" />
+                <label className="font-bold text-foreground flex items-center gap-1.5 text-xs">
+                  <Lock className="w-3.5 h-3.5 text-primary" />
                   Harga Modal / HPP (Khusus Owner - BR-11)
                 </label>
-                <Badge className="bg-amber-200/80 text-amber-900 text-[10px]">Rahasia</Badge>
+                <Badge className="bg-primary/20 text-primary text-[10px]">Rahasia</Badge>
               </div>
               <Input
                 type="number"
@@ -235,9 +235,9 @@ export function ProductFormModal({
                 placeholder="7500"
                 value={hargaModal}
                 onChange={(e) => setHargaModal(parseInt(e.target.value) || 0)}
-                className="font-mono text-xs font-bold bg-white border-amber-300 h-9"
+                className="font-mono text-xs font-bold bg-card border-primary/30 h-9"
               />
-              <p className="text-[10px] text-amber-800">
+              <p className="text-[10px] text-muted-foreground">
                 Data HPP ini tidak dapat diakses atau dilihat oleh Kepala Toko maupun Kasir.
               </p>
             </div>
@@ -245,7 +245,7 @@ export function ProductFormModal({
 
           <div className="grid grid-cols-2 gap-2 pt-1 border-t">
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Batas Stok Minimum</label>
+              <label className="font-semibold text-foreground">Batas Stok Minimum</label>
               <Input
                 type="number"
                 min="0"
@@ -261,18 +261,18 @@ export function ProductFormModal({
                   type="checkbox"
                   checked={aktif}
                   onChange={(e) => setAktif(e.target.checked)}
-                  className="rounded border-slate-300 text-amber-600 focus:ring-amber-500 w-4 h-4"
+                  className="rounded border-border text-primary focus:ring-primary w-4 h-4"
                 />
-                <span className="font-semibold text-slate-700">Produk Aktif (Dapat Dijual)</span>
+                <span className="font-semibold text-foreground">Produk Aktif (Dapat Dijual)</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={lacakStok}
                   onChange={(e) => setLacakStok(e.target.checked)}
-                  className="rounded border-slate-300 text-amber-600 focus:ring-amber-500 w-4 h-4"
+                  className="rounded border-border text-primary focus:ring-primary w-4 h-4"
                 />
-                <span className="text-slate-600 text-[11px]">Lacak Stok di Cabang</span>
+                <span className="text-muted-foreground text-[11px]">Lacak Stok di Cabang</span>
               </label>
             </div>
           </div>
@@ -292,7 +292,7 @@ export function ProductFormModal({
               type="submit"
               size="sm"
               disabled={loading}
-              className="bg-amber-600 hover:bg-amber-700 text-white text-xs gap-1.5"
+              className="text-xs gap-1.5"
             >
               {loading ? (
                 <>

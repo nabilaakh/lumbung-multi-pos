@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, AlertTriangle, Ban } from 'lucide-react';
+import { AlertCircle, AlertTriangle, Ban, Loader2 } from 'lucide-react';
 
 interface VoidModalProps {
   isOpen: boolean;
@@ -117,7 +117,7 @@ export function VoidModal({
               </label>
               <span
                 className={`font-mono text-[11px] ${
-                  isReasonValid ? 'text-emerald-600' : 'text-muted-foreground'
+                  isReasonValid ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground'
                 }`}
               >
                 {charCount}/{MIN_VOID_REASON_LENGTH} karakter
@@ -162,7 +162,14 @@ export function VoidModal({
             onClick={handleConfirmVoid}
             disabled={isLoading || !isReasonValid}
           >
-            {isLoading ? 'Memproses Void...' : 'Konfirmasi Pembatalan (Void)'}
+            {isLoading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Memproses Void...
+              </>
+            ) : (
+              'Konfirmasi Pembatalan (Void)'
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -37,7 +37,7 @@ export function ReceiptModal({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="text-center sm:text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 mb-2">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 mb-2">
             <CheckCircle2 className="h-7 w-7" />
           </div>
           <DialogTitle className="text-xl font-bold">Transaksi Berhasil!</DialogTitle>
@@ -88,7 +88,7 @@ export function ReceiptModal({
           </div>
           <div className="flex justify-between text-muted-foreground text-[11px]">
             <span>Kembalian:</span>
-            <span className="font-semibold text-emerald-600">
+            <span className="font-semibold text-emerald-600 dark:text-emerald-400">
               Rp{receiptData.kembalian.toLocaleString('id-ID')}
             </span>
           </div>
@@ -108,7 +108,7 @@ export function ReceiptModal({
           <Button
             type="button"
             onClick={onNewTransaction}
-            className="flex-1 h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-bold"
+            className="flex-1 h-11 font-bold"
           >
             <PlusCircle className="h-4 w-4 mr-2" />
             Transaksi Baru

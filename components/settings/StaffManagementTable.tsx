@@ -109,23 +109,23 @@ export function StaffManagementTable({
   return (
     <div className="space-y-4">
       {/* Search and Filters */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+      <div className="bg-card p-4 rounded-xl border border-border shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
         <div className="flex flex-1 items-center gap-2.5 flex-wrap">
           <div className="relative flex-1 max-w-sm">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
             <Input
               type="text"
               placeholder="Cari nama atau email staf..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 text-xs h-9 bg-slate-50 border-slate-200"
+              className="pl-9 text-xs h-9 bg-muted/50 border-border"
             />
           </div>
 
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="h-9 px-3 rounded-md border border-slate-200 bg-slate-50 text-xs text-slate-700 font-medium focus:outline-none"
+            className="h-9 px-3 rounded-md border border-border bg-muted/50 text-xs text-foreground font-medium focus:outline-none"
           >
             <option value="all">Semua Peran</option>
             <option value="owner">Owner</option>
@@ -136,7 +136,7 @@ export function StaffManagementTable({
           <select
             value={branchFilter}
             onChange={(e) => setBranchFilter(e.target.value)}
-            className="h-9 px-3 rounded-md border border-slate-200 bg-slate-50 text-xs text-slate-700 font-medium focus:outline-none"
+            className="h-9 px-3 rounded-md border border-border bg-muted/50 text-xs text-foreground font-medium focus:outline-none"
           >
             <option value="all">Semua Penempatan Cabang</option>
             {branches.map((b) => (
@@ -149,17 +149,17 @@ export function StaffManagementTable({
       </div>
 
       {/* Staff Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
         <Table>
-          <TableHeader className="bg-slate-50">
+          <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead className="text-xs font-bold text-slate-600">Nama Lengkap</TableHead>
-              <TableHead className="text-xs font-bold text-slate-600">Email Login</TableHead>
-              <TableHead className="text-xs font-bold text-slate-600">Peran / Hak Akses</TableHead>
-              <TableHead className="text-xs font-bold text-slate-600">Penempatan Cabang</TableHead>
-              <TableHead className="text-xs font-bold text-slate-600 text-center">Status</TableHead>
+              <TableHead className="text-xs font-bold text-muted-foreground">Nama Lengkap</TableHead>
+              <TableHead className="text-xs font-bold text-muted-foreground">Email Login</TableHead>
+              <TableHead className="text-xs font-bold text-muted-foreground">Peran / Hak Akses</TableHead>
+              <TableHead className="text-xs font-bold text-muted-foreground">Penempatan Cabang</TableHead>
+              <TableHead className="text-xs font-bold text-muted-foreground text-center">Status</TableHead>
               {isOwner && (
-                <TableHead className="text-xs font-bold text-slate-600 text-right">Aksi</TableHead>
+                <TableHead className="text-xs font-bold text-muted-foreground text-right">Aksi</TableHead>
               )}
             </TableRow>
           </TableHeader>
@@ -168,7 +168,7 @@ export function StaffManagementTable({
               <TableRow>
                 <TableCell
                   colSpan={isOwner ? 6 : 5}
-                  className="text-center py-8 text-xs text-slate-500"
+                  className="text-center py-8 text-xs text-muted-foreground"
                 >
                   Tidak ada data staf yang sesuai.
                 </TableCell>
@@ -177,47 +177,47 @@ export function StaffManagementTable({
               filteredStaff.map((staff) => {
                 const branchObj = branches.find((b) => b.id === staff.cabang_id);
                 return (
-                  <TableRow key={staff.id} className="hover:bg-slate-50/80 transition-colors">
-                    <TableCell className="text-xs font-bold text-slate-800">
+                  <TableRow key={staff.id} className="hover:bg-muted/40 transition-colors">
+                    <TableCell className="text-xs font-bold text-foreground">
                       {staff.nama_lengkap}
                     </TableCell>
-                    <TableCell className="text-xs font-mono text-slate-600">
+                    <TableCell className="text-xs font-mono text-muted-foreground">
                       {staff.email}
                     </TableCell>
                     <TableCell>
                       {staff.peran === 'owner' ? (
-                        <Badge className="bg-amber-100 text-amber-900 border-amber-300 text-[10px] hover:bg-amber-100">
+                        <Badge className="bg-primary/10 text-primary border-primary/20 text-[10px] hover:bg-primary/10">
                           Owner (Direksi)
                         </Badge>
                       ) : staff.peran === 'kepala_toko' ? (
-                        <Badge className="bg-blue-100 text-blue-900 border-blue-300 text-[10px] hover:bg-blue-100">
+                        <Badge className="bg-blue-100 text-blue-900 border-blue-300 text-[10px] hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800 dark:hover:bg-blue-950/50">
                           Kepala Toko
                         </Badge>
                       ) : (
-                        <Badge className="bg-slate-100 text-slate-700 border-slate-300 text-[10px] hover:bg-slate-100">
+                        <Badge className="bg-muted text-foreground border-border text-[10px] hover:bg-muted/60">
                           Kasir
                         </Badge>
                       )}
                     </TableCell>
-                    <TableCell className="text-xs text-slate-700">
+                    <TableCell className="text-xs text-foreground">
                       {staff.peran === 'owner' ? (
-                        <span className="text-slate-400 italic">Semua Cabang</span>
+                        <span className="text-muted-foreground italic">Semua Cabang</span>
                       ) : branchObj ? (
                         <span>
-                          <strong className="text-slate-800">{branchObj.kode}</strong> -{' '}
+                          <strong className="text-foreground">{branchObj.kode}</strong> -{' '}
                           {branchObj.nama}
                         </span>
                       ) : (
-                        <span className="text-rose-500 text-[11px]">Belum diatur</span>
+                        <span className="text-rose-500 dark:text-rose-400 text-[11px]">Belum diatur</span>
                       )}
                     </TableCell>
                     <TableCell className="text-center">
                       {staff.aktif ? (
-                        <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-[10px] hover:bg-emerald-100">
+                        <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-[10px] hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 dark:hover:bg-emerald-950/50">
                           Aktif
                         </Badge>
                       ) : (
-                        <Badge className="bg-rose-100 text-rose-700 border-rose-300 text-[10px] hover:bg-rose-100">
+                        <Badge className="bg-rose-100 text-rose-700 border-rose-300 text-[10px] hover:bg-rose-100 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 dark:hover:bg-rose-950/50">
                           Nonaktif
                         </Badge>
                       )}
@@ -229,7 +229,7 @@ export function StaffManagementTable({
                             size="sm"
                             variant="ghost"
                             onClick={() => handleOpenEdit(staff)}
-                            className="h-7 px-2 text-xs text-slate-600 hover:text-amber-700"
+                            className="h-7 px-2 text-xs text-muted-foreground hover:text-primary"
                           >
                             <Edit className="w-3.5 h-3.5 mr-1" />
                             Ubah
@@ -241,8 +241,8 @@ export function StaffManagementTable({
                               onClick={() => handleToggleStatus(staff)}
                               className={`h-7 px-2 text-[11px] font-semibold ${
                                 staff.aktif
-                                  ? 'text-rose-700 border-rose-200 hover:bg-rose-50'
-                                  : 'text-emerald-700 border-emerald-200 hover:bg-emerald-50'
+                                  ? 'text-rose-700 border-rose-200 hover:bg-rose-50 dark:text-rose-300 dark:border-rose-900 dark:hover:bg-rose-950/30'
+                                  : 'text-emerald-700 border-emerald-200 hover:bg-emerald-50 dark:text-emerald-300 dark:border-emerald-900 dark:hover:bg-emerald-950/30'
                               }`}
                             >
                               {staff.aktif ? 'Nonaktifkan' : 'Aktifkan'}
@@ -262,25 +262,25 @@ export function StaffManagementTable({
       {/* Edit Staff Modal */}
       {editingStaff && (
         <Dialog open={!!editingStaff} onOpenChange={(open) => !open && setEditingStaff(null)}>
-          <DialogContent className="sm:max-w-md bg-white border border-slate-200">
+          <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="text-base font-bold text-slate-800">
+              <DialogTitle className="text-base font-bold text-foreground">
                 Atur Penempatan & Peran Staf
               </DialogTitle>
             </DialogHeader>
 
             <div className="space-y-3 text-xs">
-              <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-                <div className="font-bold text-slate-800">{editingStaff.nama_lengkap}</div>
-                <div className="text-slate-500 font-mono text-[11px]">{editingStaff.email}</div>
+              <div className="bg-muted/50 p-2.5 rounded-lg border border-border">
+                <div className="font-bold text-foreground">{editingStaff.nama_lengkap}</div>
+                <div className="text-muted-foreground font-mono text-[11px]">{editingStaff.email}</div>
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Peran Akun</label>
+                <label className="font-semibold text-foreground">Peran Akun</label>
                 <select
                   value={selectedRole}
                   onChange={(e) => setSelectedRole(e.target.value as PeranPengguna)}
-                  className="w-full h-9 px-3 rounded-md border border-slate-300 bg-white text-xs"
+                  className="w-full h-9 px-3 rounded-md border border-border bg-card text-xs"
                 >
                   <option value="kasir">Kasir</option>
                   <option value="kepala_toko">Kepala Toko</option>
@@ -290,11 +290,11 @@ export function StaffManagementTable({
 
               {selectedRole !== 'owner' && (
                 <div className="space-y-1">
-                  <label className="font-semibold text-slate-700">Cabang Penempatan</label>
+                  <label className="font-semibold text-foreground">Cabang Penempatan</label>
                   <select
                     value={selectedBranch}
                     onChange={(e) => setSelectedBranch(e.target.value)}
-                    className="w-full h-9 px-3 rounded-md border border-slate-300 bg-white text-xs"
+                    className="w-full h-9 px-3 rounded-md border border-border bg-card text-xs"
                   >
                     <option value="">Pilih Cabang...</option>
                     {branches.map((b) => (
@@ -321,7 +321,7 @@ export function StaffManagementTable({
                 size="sm"
                 onClick={handleSaveEdit}
                 disabled={isUpdating}
-                className="bg-amber-600 hover:bg-amber-700 text-white text-xs"
+                className="text-xs"
               >
                 {isUpdating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Simpan'}
               </Button>

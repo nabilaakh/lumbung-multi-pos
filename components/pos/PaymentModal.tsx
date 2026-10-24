@@ -259,7 +259,7 @@ export function PaymentModal({
                 <span
                   className={`text-lg font-extrabold ${
                     paymentValidation.valid
-                      ? 'text-emerald-600'
+                      ? 'text-emerald-600 dark:text-emerald-400'
                       : 'text-destructive text-sm'
                   }`}
                 >
@@ -319,7 +319,7 @@ export function PaymentModal({
             type="button"
             onClick={handleCheckout}
             disabled={isLoading || !paymentValidation.valid}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+            className="font-bold"
           >
             {isLoading ? 'Memproses Transaksi...' : 'Selesaikan Pembayaran'}
           </Button>
