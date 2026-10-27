@@ -12,6 +12,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { AuditLogEntry } from '@/lib/services/settings-service';
 import { LoadingState } from '@/components/ui/loading-state';
 import { Search, ShieldAlert, History, User, RefreshCw } from 'lucide-react';
@@ -44,25 +51,25 @@ export function AuditLogTable({ logs, onRefresh, loading = false }: AuditLogTabl
     switch (aksi) {
       case 'void_transaksi':
         return (
-          <Badge className="bg-rose-100 text-rose-800 border-rose-300 text-[10px] hover:bg-rose-100 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 dark:hover:bg-rose-950/50">
+          <Badge variant="destructive" className="font-medium text-xs px-2.5 py-0.5 rounded-full">
             Void Transaksi
           </Badge>
         );
       case 'penyesuaian_stok':
         return (
-          <Badge className="bg-primary/10 text-primary border-primary/20 text-[10px] hover:bg-primary/10">
+          <Badge variant="default" className="font-medium text-xs px-2.5 py-0.5 rounded-full">
             Penyesuaian Stok
           </Badge>
         );
       case 'verifikasi_shift':
         return (
-          <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-[10px] hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 dark:hover:bg-emerald-950/50">
+          <Badge variant="success" className="font-medium text-xs px-2.5 py-0.5 rounded-full">
             Verifikasi Shift
           </Badge>
         );
       default:
         return (
-          <Badge variant="outline" className="text-[10px]">
+          <Badge variant="outline" className="font-medium text-xs px-2.5 py-0.5 rounded-full">
             {aksi}
           </Badge>
         );
@@ -71,54 +78,56 @@ export function AuditLogTable({ logs, onRefresh, loading = false }: AuditLogTabl
 
   return (
     <div className="space-y-4">
-      {/* Search and Action Filter */}
-      <div className="bg-card p-4 rounded-xl border border-border shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
-        <div className="flex flex-1 items-center gap-2.5 flex-wrap">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
-            <Input
-              type="text"
-              placeholder="Cari pelaku, aksi, atau tabel..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 text-xs h-9 bg-muted/50 border-border"
-            />
-          </div>
-
-          <select
-            value={actionFilter}
-            onChange={(e) => setActionFilter(e.target.value)}
-            className="h-9 px-3 rounded-md border border-border bg-muted/50 text-xs text-foreground font-medium focus:outline-none"
-          >
-            <option value="all">Semua Jenis Aksi Audit</option>
-            <option value="penyesuaian_stok">Penyesuaian Stok</option>
-            <option value="void_transaksi">Void Transaksi</option>
-            <option value="verifikasi_shift">Verifikasi Shift</option>
-          </select>
+      {/* Search and Action Filter Container */}
+      <div className="rounded-xl border border-border/60 bg-card p-3 shadow-xs flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+        <div className="relative flex-1 min-w-[200px] max-w-sm">
+          <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Input
+            type="text"
+            placeholder="Cari pelaku, aksi, atau tabel..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9 text-sm h-10 bg-background/50 rounded-xl"
+          />
         </div>
 
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onRefresh}
-          disabled={loading}
-          className="text-xs h-9 gap-1.5 text-muted-foreground"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-          Refresh Log
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="w-[200px]">
+            <Select value={actionFilter} onValueChange={setActionFilter}>
+              <SelectTrigger className="h-10 text-sm rounded-xl">
+                <SelectValue placeholder="Semua Aksi" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Jenis Aksi Audit</SelectItem>
+                <SelectItem value="penyesuaian_stok">Penyesuaian Stok</SelectItem>
+                <SelectItem value="void_transaksi">Void Transaksi</SelectItem>
+                <SelectItem value="verifikasi_shift">Verifikasi Shift</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Button
+            variant="outline"
+            onClick={onRefresh}
+            disabled={loading}
+            className="h-10 px-3 text-sm rounded-xl"
+          >
+            <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        </div>
       </div>
 
       {/* Table */}
-      <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+      <div className="rounded-xl border border-border bg-card shadow-xs overflow-hidden">
         <Table>
-          <TableHeader className="bg-muted/50">
-            <TableRow>
-              <TableHead className="text-xs font-bold text-muted-foreground">Waktu Kejadian</TableHead>
-              <TableHead className="text-xs font-bold text-muted-foreground">Pelaku</TableHead>
-              <TableHead className="text-xs font-bold text-muted-foreground">Aksi Sistem (BR-12)</TableHead>
-              <TableHead className="text-xs font-bold text-muted-foreground">Tabel Terkait</TableHead>
-              <TableHead className="text-xs font-bold text-muted-foreground">Perubahan / Alasan</TableHead>
+          <TableHeader>
+            <TableRow className="bg-muted/40 border-b border-border/60 hover:bg-muted/40">
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Waktu Kejadian</TableHead>
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Pelaku</TableHead>
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Aksi Sistem (BR-12)</TableHead>
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tabel Terkait</TableHead>
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Perubahan / Alasan</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -130,13 +139,13 @@ export function AuditLogTable({ logs, onRefresh, loading = false }: AuditLogTabl
               </TableRow>
             ) : filteredLogs.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-xs text-muted-foreground">
+                <TableCell colSpan={5} className="text-center py-12 text-sm text-muted-foreground">
                   Tidak ada catatan audit log yang sesuai.
                 </TableCell>
               </TableRow>
             ) : (
               filteredLogs.map((log) => (
-                <TableRow key={log.id} className="hover:bg-muted/40 transition-colors">
+                <TableRow key={log.id} className="border-b border-border/40 hover:bg-muted/30 transition-colors py-3 px-4 text-sm">
                   <TableCell className="font-mono text-xs text-muted-foreground whitespace-nowrap">
                     {new Date(log.dibuat_pada).toLocaleString('id-ID')}
                   </TableCell>

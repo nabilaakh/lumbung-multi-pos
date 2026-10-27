@@ -70,11 +70,10 @@ export default function PengaturanPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground font-serif flex items-center gap-2">
-            <Settings className="w-6 h-6 text-primary" />
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Pengaturan Sistem & Audit
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground mt-1">
             Kelola penempatan akun staf, konfigurasi cabang, dan riwayat audit perubahan sistem (BR-12).
           </p>
         </div>

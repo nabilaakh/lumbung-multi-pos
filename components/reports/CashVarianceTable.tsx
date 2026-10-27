@@ -34,39 +34,36 @@ export function CashVarianceTable({ shiftVariances }: CashVarianceTableProps) {
         </div>
       </CardHeader>
       <CardContent className="pt-2">
-        <div className="rounded-lg border border-border overflow-hidden">
+        <div className="rounded-xl border border-border bg-card shadow-xs overflow-hidden">
           <Table>
-            <TableHeader className="bg-muted/50">
-              <TableRow>
-                <TableHead className="text-xs font-bold text-muted-foreground">Waktu Tutup</TableHead>
-                <TableHead className="text-xs font-bold text-muted-foreground">Kasir</TableHead>
-                <TableHead className="text-xs font-bold text-muted-foreground">Cabang</TableHead>
-                <TableHead className="text-xs font-bold text-muted-foreground text-right">Kas Sistem</TableHead>
-                <TableHead className="text-xs font-bold text-muted-foreground text-right">Kas Fisik</TableHead>
-                <TableHead className="text-xs font-bold text-muted-foreground text-right">Selisih Kas</TableHead>
-                <TableHead className="text-xs font-bold text-muted-foreground text-center">Status</TableHead>
+            <TableHeader>
+              <TableRow className="bg-muted/40 border-b border-border/60 hover:bg-muted/40">
+                <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Waktu Tutup</TableHead>
+                <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Kasir</TableHead>
+                <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Cabang</TableHead>
+                <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-right">Kas Sistem</TableHead>
+                <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-right">Kas Fisik</TableHead>
+                <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-right">Selisih Kas</TableHead>
+                <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-center">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {shiftVariances.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-6 text-xs text-muted-foreground">
+                  <TableCell colSpan={7} className="text-center py-12 text-sm text-muted-foreground">
                     Belum ada data shift yang ditutup.
                   </TableCell>
                 </TableRow>
               ) : (
                 shiftVariances.map((s) => {
                   const isHigh = isHighCashVariance(s.selisih);
-                  const varInfo = formatVarianceDisplay(s.selisih);
 
                   return (
                     <TableRow
                       key={s.id}
-                      className={`hover:bg-muted/40 transition-colors ${
-                        isHigh ? 'bg-rose-50/40 dark:bg-rose-950/20' : ''
-                      }`}
+                      className="border-b border-border/40 hover:bg-muted/30 transition-colors py-3 px-4 text-sm"
                     >
-                      <TableCell className="font-mono text-xs text-muted-foreground whitespace-nowrap">
+                      <TableCell className="py-3 px-4 font-mono text-xs text-muted-foreground whitespace-nowrap">
                         {s.waktu_tutup
                           ? new Date(s.waktu_tutup).toLocaleDateString('id-ID', {
                               day: '2-digit',
@@ -76,26 +73,26 @@ export function CashVarianceTable({ shiftVariances }: CashVarianceTableProps) {
                             })
                           : 'Belum Tutup'}
                       </TableCell>
-                      <TableCell className="text-xs font-semibold text-foreground">
+                      <TableCell className="py-3 px-4 font-medium text-foreground">
                         {s.kasir_nama}
                       </TableCell>
-                      <TableCell className="font-bold text-xs text-foreground">
+                      <TableCell className="py-3 px-4 font-semibold text-foreground">
                         {s.cabang_kode}
                       </TableCell>
-                      <TableCell className="text-right font-mono text-xs text-foreground">
+                      <TableCell className="py-3 px-4 text-right font-mono text-foreground">
                         Rp {s.kas_seharusnya.toLocaleString('id-ID')}
                       </TableCell>
-                      <TableCell className="text-right font-mono text-xs text-foreground font-semibold">
+                      <TableCell className="py-3 px-4 text-right font-mono text-foreground font-semibold">
                         {s.kas_aktual !== null
                           ? `Rp ${s.kas_aktual.toLocaleString('id-ID')}`
                           : '-'}
                       </TableCell>
-                      <TableCell className="text-right whitespace-nowrap">
+                      <TableCell className="py-3 px-4 text-right whitespace-nowrap">
                         {s.selisih !== null ? (
                           <span
-                            className={`font-mono text-xs font-bold px-2 py-0.5 rounded ${
+                            className={`font-mono text-xs font-bold px-2 py-0.5 rounded-full ${
                               isHigh
-                                ? 'text-rose-700 bg-rose-100 dark:text-rose-300 dark:bg-rose-950/40'
+                                ? 'text-destructive bg-destructive/10'
                                 : s.selisih === 0
                                 ? 'text-emerald-700 bg-emerald-50 dark:text-emerald-300 dark:bg-emerald-950/30'
                                 : 'text-primary bg-primary/10'
@@ -108,17 +105,17 @@ export function CashVarianceTable({ shiftVariances }: CashVarianceTableProps) {
                           '-'
                         )}
                       </TableCell>
-                      <TableCell className="text-center">
+                      <TableCell className="py-3 px-4 text-center">
                         {isHigh ? (
-                          <Badge className="bg-rose-100 text-rose-800 border-rose-300 text-[10px] hover:bg-rose-100 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 dark:hover:bg-rose-950/50">
+                          <Badge variant="destructive" className="font-medium text-xs px-2.5 py-0.5 rounded-full">
                             Penyimpangan &gt; 20k
                           </Badge>
                         ) : s.status === 'diverifikasi' ? (
-                          <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-[10px] hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 dark:hover:bg-emerald-950/50">
+                          <Badge variant="success" className="font-medium text-xs px-2.5 py-0.5 rounded-full">
                             Diverifikasi
                           </Badge>
                         ) : (
-                          <Badge className="bg-amber-100 text-amber-800 border-amber-300 text-[10px] hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800 dark:hover:bg-amber-950/50">
+                          <Badge variant="warning" className="font-medium text-xs px-2.5 py-0.5 rounded-full">
                             {s.status}
                           </Badge>
                         )}

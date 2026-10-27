@@ -29,19 +29,19 @@ export function ShiftSummaryCard({ shift, totalTunaiLive, totalQrisLive }: Shift
   };
 
   return (
-    <Card className="border-border shadow-md">
-      <CardHeader className="pb-4">
+    <Card className="rounded-xl border border-border bg-card shadow-xs overflow-hidden">
+      <CardHeader className="pb-4 border-b border-border/60 bg-muted/20">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Badge
-              variant="outline"
-              className={
+              variant={
                 shift.status === 'buka'
-                  ? 'bg-blue-100 text-blue-800 border-blue-300 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800'
+                  ? 'default'
                   : shift.status === 'diverifikasi'
-                  ? 'bg-emerald-100 text-emerald-800 border-emerald-300 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800'
-                  : 'bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800'
+                  ? 'success'
+                  : 'warning'
               }
+              className="font-medium text-xs px-2.5 py-0.5 rounded-full"
             >
               {shift.status === 'buka' ? '● Sedang Buka' : shift.status === 'ditutup' ? 'Ditutup (Menunggu Verifikasi)' : 'Diverifikasi'}
             </Badge>
@@ -59,59 +59,85 @@ export function ShiftSummaryCard({ shift, totalTunaiLive, totalQrisLive }: Shift
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl bg-muted/40 border border-border/50">
-          <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium mb-1">
-            <Wallet className="h-4 w-4 text-primary" />
-            <span>Kas Awal di Laci</span>
+      <CardContent className="p-5 space-y-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Kas Awal */}
+          <div className="rounded-xl border border-border bg-card p-5 shadow-xs flex items-start justify-between">
+            <div className="space-y-1">
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Kas Awal di Laci
+              </span>
+              <p className="text-xl font-bold tracking-tight text-foreground">
+                Rp{shift.kas_awal.toLocaleString('id-ID')}
+              </p>
+              <span className="text-xs text-muted-foreground">Modal kerja awal</span>
+            </div>
+            <div className="h-9 w-9 p-2 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+              <Wallet className="h-5 w-5" />
+            </div>
           </div>
-          <p className="text-2xl font-bold tracking-tight text-foreground">
-            Rp{shift.kas_awal.toLocaleString('id-ID')}
-          </p>
-        </div>
 
-        <div className="p-4 rounded-xl bg-muted/40 border border-border/50">
-          <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium mb-1">
-            <ArrowDownRight className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-            <span>Penjualan Tunai Lunas</span>
+          {/* Penjualan Tunai */}
+          <div className="rounded-xl border border-border bg-card p-5 shadow-xs flex items-start justify-between">
+            <div className="space-y-1">
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Penjualan Tunai
+              </span>
+              <p className="text-xl font-bold tracking-tight text-emerald-700 dark:text-emerald-400">
+                + Rp{totalTunai.toLocaleString('id-ID')}
+              </p>
+              <span className="text-xs text-emerald-700 dark:text-emerald-400 font-medium">Transaksi tunai lunas</span>
+            </div>
+            <div className="h-9 w-9 p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900 flex items-center justify-center shrink-0">
+              <ArrowDownRight className="h-5 w-5" />
+            </div>
           </div>
-          <p className="text-2xl font-bold tracking-tight text-emerald-700 dark:text-emerald-400">
-            + Rp{totalTunai.toLocaleString('id-ID')}
-          </p>
-        </div>
 
-        <div className="p-4 rounded-xl bg-muted/40 border border-border/50">
-          <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium mb-1">
-            <CreditCard className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-            <span>Penjualan QRIS Lunas</span>
+          {/* Penjualan QRIS */}
+          <div className="rounded-xl border border-border bg-card p-5 shadow-xs flex items-start justify-between">
+            <div className="space-y-1">
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Penjualan QRIS
+              </span>
+              <p className="text-xl font-bold tracking-tight text-blue-700 dark:text-blue-400">
+                Rp{totalQris.toLocaleString('id-ID')}
+              </p>
+              <span className="text-xs text-blue-700 dark:text-blue-400 font-medium">Non-tunai rekening</span>
+            </div>
+            <div className="h-9 w-9 p-2 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900 flex items-center justify-center shrink-0">
+              <CreditCard className="h-5 w-5" />
+            </div>
           </div>
-          <p className="text-2xl font-bold tracking-tight text-blue-700 dark:text-blue-400">
-            Rp{totalQris.toLocaleString('id-ID')}
-          </p>
-        </div>
 
-        <div className="p-4 rounded-xl bg-primary/10 border border-primary/30">
-          <div className="flex items-center gap-2 text-primary text-xs font-semibold mb-1">
-            <CheckCircle2 className="h-4 w-4" />
-            <span>Kas Tunai Seharusnya</span>
+          {/* Kas Seharusnya */}
+          <div className="rounded-xl border border-primary/20 bg-primary/5 p-5 shadow-xs flex items-start justify-between">
+            <div className="space-y-1">
+              <span className="text-xs font-semibold text-primary uppercase tracking-wider">
+                Kas Tunai Seharusnya
+              </span>
+              <p className="text-xl font-bold tracking-tight text-primary">
+                Rp{kasSeharusnya.toLocaleString('id-ID')}
+              </p>
+              <span className="text-xs text-muted-foreground">Kas awal + tunai</span>
+            </div>
+            <div className="h-9 w-9 p-2 rounded-lg bg-primary/15 text-primary flex items-center justify-center shrink-0">
+              <CheckCircle2 className="h-5 w-5" />
+            </div>
           </div>
-          <p className="text-2xl font-extrabold tracking-tight text-primary">
-            Rp{kasSeharusnya.toLocaleString('id-ID')}
-          </p>
         </div>
 
         {isClosed && shift.uang_fisik !== null && (
-          <div className="col-span-full grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-border/60">
-            <div className="p-3.5 rounded-lg bg-card border">
-              <span className="text-xs text-muted-foreground font-medium">Uang Fisik Dihitung:</span>
-              <p className="text-lg font-bold text-foreground">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-border/60">
+            <div className="p-4 rounded-xl bg-card border border-border shadow-xs">
+              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Uang Fisik Dihitung</span>
+              <p className="text-lg font-bold text-foreground mt-1">
                 Rp{(shift.uang_fisik ?? 0).toLocaleString('id-ID')}
               </p>
             </div>
-            <div className="p-3.5 rounded-lg bg-card border">
-              <span className="text-xs text-muted-foreground font-medium">Selisih Kas:</span>
+            <div className="p-4 rounded-xl bg-card border border-border shadow-xs">
+              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Selisih Kas</span>
               <p
-                className={`text-lg font-bold ${
+                className={`text-lg font-bold mt-1 ${
                   (shift.selisih ?? 0) === 0
                     ? 'text-emerald-600 dark:text-emerald-400'
                     : (shift.selisih ?? 0) < 0
@@ -124,7 +150,7 @@ export function ShiftSummaryCard({ shift, totalTunaiLive, totalQrisLive }: Shift
               </p>
             </div>
             {shift.catatan_tutup && (
-              <div className="col-span-full p-3.5 rounded-lg bg-muted/60 text-xs text-muted-foreground flex gap-2 items-start">
+              <div className="col-span-full p-4 rounded-xl bg-muted/40 border border-border text-xs text-muted-foreground flex gap-2.5 items-start">
                 <FileText className="h-4 w-4 shrink-0 text-muted-foreground mt-0.5" />
                 <div>
                   <span className="font-semibold text-foreground">Catatan Penutupan Kas: </span>

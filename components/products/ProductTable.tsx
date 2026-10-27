@@ -13,6 +13,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   ProductWithCost,
   PRODUCT_CATEGORIES,
 } from '@/lib/services/product-service';
@@ -89,63 +96,67 @@ export function ProductTable({
 
   return (
     <div className="space-y-4">
-      {/* Action and Filter Bar */}
-      <div className="bg-card p-4 rounded-xl border border-border shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
-        <div className="flex flex-1 items-center gap-2.5 flex-wrap">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
-            <Input
-              type="text"
-              placeholder="Cari SKU atau nama produk..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 text-xs h-9 bg-muted/50 border-border"
-            />
-          </div>
-
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="h-9 px-3 rounded-md border border-border bg-muted/50 text-xs text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            <option value="all">Semua Kategori (5 Kategori)</option>
-            {PRODUCT_CATEGORIES.map((c) => (
-              <option key={c} value={c}>
-                {c.toUpperCase()}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="h-9 px-3 rounded-md border border-border bg-muted/50 text-xs text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            <option value="all">Semua Status</option>
-            <option value="aktif">Hanya Aktif</option>
-            <option value="nonaktif">Hanya Nonaktif</option>
-          </select>
+      {/* Action and Filter Bar Container */}
+      <div className="rounded-xl border border-border/60 bg-card p-3 shadow-xs flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+        <div className="relative flex-1 min-w-[200px] max-w-sm">
+          <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Input
+            type="text"
+            placeholder="Cari SKU atau nama produk..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9 text-sm h-10 bg-background/50 rounded-xl"
+          />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Category Select */}
+          <div className="w-[170px]">
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="h-10 text-sm rounded-xl">
+                <SelectValue placeholder="Kategori" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Kategori</SelectItem>
+                {PRODUCT_CATEGORIES.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {c.toUpperCase()}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Status Select */}
+          <div className="w-[150px]">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="h-10 text-sm rounded-xl">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Status</SelectItem>
+                <SelectItem value="aktif">Hanya Aktif</SelectItem>
+                <SelectItem value="nonaktif">Hanya Nonaktif</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           <Button
             variant="outline"
-            size="sm"
             onClick={onRefresh}
             disabled={loading}
-            className="text-xs h-9 gap-1.5 text-muted-foreground"
+            className="h-10 px-3 text-sm rounded-xl"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
 
           {isOwner && (
             <Button
-              size="sm"
               onClick={handleCreate}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs h-9 gap-1.5 font-semibold"
+              className="h-10 px-4 text-sm rounded-xl font-medium"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-4 h-4 mr-1.5" />
               Tambah Produk
             </Button>
           )}
@@ -153,27 +164,27 @@ export function ProductTable({
       </div>
 
       {/* Table */}
-      <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+      <div className="rounded-xl border border-border bg-card shadow-xs overflow-hidden">
         <Table>
-          <TableHeader className="bg-muted/50">
-            <TableRow>
-              <TableHead className="text-xs font-bold text-muted-foreground">SKU</TableHead>
-              <TableHead className="text-xs font-bold text-muted-foreground">Nama Produk</TableHead>
-              <TableHead className="text-xs font-bold text-muted-foreground">Kategori</TableHead>
-              <TableHead className="text-xs font-bold text-muted-foreground text-right">Harga Jual</TableHead>
+          <TableHeader>
+            <TableRow className="bg-muted/40 border-b border-border/60 hover:bg-muted/40">
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">SKU</TableHead>
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Nama Produk</TableHead>
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Kategori</TableHead>
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-right">Harga Jual</TableHead>
               {/* Owner Exclusive Cost Column (BR-11, TC-18) */}
               {isOwner && (
-                <TableHead className="text-xs font-bold text-primary text-right bg-primary/5">
+                <TableHead className="py-3.5 px-4 text-xs font-semibold text-primary uppercase tracking-wider text-right bg-primary/5">
                   <span className="flex items-center justify-end gap-1">
-                    <Lock className="w-3 h-3 text-primary" />
+                    <Lock className="w-3.5 h-3.5 text-primary" />
                     HPP Modal (Owner)
                   </span>
                 </TableHead>
               )}
-              <TableHead className="text-xs font-bold text-muted-foreground text-right">Batas Min</TableHead>
-              <TableHead className="text-xs font-bold text-muted-foreground text-center">Status</TableHead>
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-right">Batas Min</TableHead>
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-center">Status</TableHead>
               {isOwner && (
-                <TableHead className="text-xs font-bold text-muted-foreground text-right">Aksi</TableHead>
+                <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-right">Aksi</TableHead>
               )}
             </TableRow>
           </TableHeader>
@@ -188,66 +199,66 @@ export function ProductTable({
               <TableRow>
                 <TableCell
                   colSpan={isOwner ? 8 : 6}
-                  className="text-center py-8 text-xs text-muted-foreground"
+                  className="text-center py-12 text-sm text-muted-foreground"
                 >
                   Tidak ada produk yang sesuai dengan filter.
                 </TableCell>
               </TableRow>
             ) : (
               filteredProducts.map((prod) => (
-                <TableRow key={prod.id} className="hover:bg-muted/40 transition-colors">
-                  <TableCell className="font-mono text-xs font-semibold text-foreground">
+                <TableRow key={prod.id} className="border-b border-border/40 hover:bg-muted/30 transition-colors py-3 px-4 text-sm">
+                  <TableCell className="py-3 px-4 font-mono font-medium text-foreground">
                     {prod.sku}
                   </TableCell>
-                  <TableCell className="text-xs font-semibold text-foreground">
-                    <div>{prod.nama}</div>
+                  <TableCell className="py-3 px-4 text-foreground">
+                    <div className="font-medium">{prod.nama}</div>
                     {!prod.lacak_stok && (
-                      <span className="text-[10px] text-muted-foreground font-normal">
+                      <span className="text-xs text-muted-foreground">
                         Tidak melacak stok
                       </span>
                     )}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="py-3 px-4">
                     <Badge
                       variant="secondary"
-                      className="text-[10px] uppercase font-bold tracking-wider bg-muted text-muted-foreground"
+                      className="font-medium text-xs px-2.5 py-0.5 rounded-full uppercase"
                     >
                       {prod.kategori}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right font-mono text-xs font-bold text-foreground">
+                  <TableCell className="py-3 px-4 text-right font-mono font-semibold text-foreground">
                     Rp {prod.harga_jual.toLocaleString('id-ID')}
                   </TableCell>
 
                   {/* Owner Exclusive Cost Field */}
                   {isOwner && (
-                    <TableCell className="text-right font-mono text-xs text-primary bg-primary/5">
+                    <TableCell className="py-3 px-4 text-right font-mono text-sm text-primary bg-primary/5">
                       {prod.harga_modal_terakhir !== undefined ? (
                         <div>
-                          <span className="font-bold">
+                          <span className="font-semibold">
                             Rp {prod.harga_modal_terakhir.toLocaleString('id-ID')}
                           </span>
-                          <div className="text-[10px] text-emerald-700 dark:text-emerald-400 font-sans">
+                          <div className="text-xs text-emerald-700 dark:text-emerald-400">
                             Margin: Rp{' '}
                             {(prod.harga_jual - prod.harga_modal_terakhir).toLocaleString('id-ID')}
                           </div>
                         </div>
                       ) : (
-                        <span className="text-muted-foreground italic text-[11px]">-</span>
+                        <span className="text-muted-foreground italic text-xs">-</span>
                       )}
                     </TableCell>
                   )}
 
-                  <TableCell className="text-right font-mono text-xs text-muted-foreground">
+                  <TableCell className="py-3 px-4 text-right font-mono text-sm text-muted-foreground">
                     {prod.stok_minimum}
                   </TableCell>
-                  <TableCell className="text-center">
+                  <TableCell className="py-3 px-4 text-center">
                     {prod.aktif ? (
-                      <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-[10px] hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 dark:hover:bg-emerald-950/50">
+                      <Badge variant="success" className="font-medium text-xs px-2.5 py-0.5 rounded-full">
                         Aktif
                       </Badge>
                     ) : (
-                      <Badge className="bg-muted text-muted-foreground border-border text-[10px] hover:bg-muted/60">
+                      <Badge variant="secondary" className="font-medium text-xs px-2.5 py-0.5 rounded-full">
                         Nonaktif
                       </Badge>
                     )}
@@ -255,25 +266,27 @@ export function ProductTable({
 
                   {/* Owner Actions */}
                   {isOwner && (
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1.5">
+                    <TableCell className="py-3 px-4 text-right">
+                      <div className="flex items-center justify-end gap-1">
                         <Button
-                          size="sm"
+                          size="icon"
                           variant="ghost"
                           onClick={() => setSelectedProductForCostHistory(prod)}
                           title="Lihat Riwayat HPP"
-                          className="h-7 w-7 p-0 text-primary hover:bg-primary/10"
+                          className="h-8 w-8 rounded-md text-muted-foreground hover:text-primary"
                         >
-                          <History className="w-3.5 h-3.5" />
+                          <History className="h-4 w-4" />
+                          <span className="sr-only">Lihat Riwayat HPP</span>
                         </Button>
                         <Button
-                          size="sm"
+                          size="icon"
                           variant="ghost"
                           onClick={() => handleEdit(prod)}
                           title="Ubah Produk"
-                          className="h-7 w-7 p-0 text-muted-foreground hover:bg-muted/60"
+                          className="h-8 w-8 rounded-md text-muted-foreground hover:text-foreground"
                         >
-                          <Edit2 className="w-3.5 h-3.5" />
+                          <Edit2 className="h-4 w-4" />
+                          <span className="sr-only">Ubah Produk</span>
                         </Button>
                       </div>
                     </TableCell>

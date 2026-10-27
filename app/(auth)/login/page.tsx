@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { LoadingState } from '@/components/ui/loading-state';
 import { BrandLogo } from '@/components/brand/brand-logo';
 import { Lock, Mail, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
+import { ModeToggle } from '@/components/ui/mode-toggle';
 import type { ProfilPengguna } from '@/types/database';
 
 function LoginForm() {
@@ -107,11 +108,6 @@ function LoginForm() {
             Sistem Kasir Multi-Cabang (MultiPOS)
           </CardDescription>
         </div>
-        <div className="flex justify-center gap-2 pt-1">
-          <Badge variant="outline" className="text-xs font-medium px-2 py-0.5">Tebet</Badge>
-          <Badge variant="outline" className="text-xs font-medium px-2 py-0.5">Bintaro</Badge>
-          <Badge variant="outline" className="text-xs font-medium px-2 py-0.5">Depok</Badge>
-        </div>
       </CardHeader>
 
       <form onSubmit={handleLogin}>
@@ -132,7 +128,7 @@ function LoginForm() {
               <Input
                 id="email"
                 type="email"
-                placeholder="nama@lumbung.test"
+                placeholder="nama@email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
@@ -173,7 +169,7 @@ function LoginForm() {
           </div>
         </CardContent>
 
-        <CardFooter className="pt-2 pb-6 flex flex-col gap-3">
+        <CardFooter className="pt-6 pb-6 flex flex-col gap-3">
           <Button
             type="submit"
             className="w-full h-11 text-base font-medium shadow-md transition-all active:scale-[0.99]"
@@ -185,12 +181,9 @@ function LoginForm() {
                 Memverifikasi...
               </>
             ) : (
-              'Masuk ke Aplikasi'
+              'Masuk'
             )}
           </Button>
-          <p className="text-center text-xs text-muted-foreground">
-            Akses terbatas hanya untuk staf & pengelola Lumbung Kopi dan Roti
-          </p>
         </CardFooter>
       </form>
     </Card>
@@ -199,7 +192,12 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 bg-gradient-to-br from-primary/5 via-background to-muted/20">
+    <div className="relative min-h-screen w-full flex items-center justify-center p-4 bg-gradient-to-br from-primary/5 via-background to-muted/20">
+      {/* Tombol switch tema di pojok kanan atas */}
+      <div className="absolute top-6 right-6 z-20">
+        <ModeToggle />
+      </div>
+
       <Suspense fallback={<LoadingState fullScreen label="Memuat halaman masuk..." />}>
         <LoginForm />
       </Suspense>

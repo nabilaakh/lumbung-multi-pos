@@ -18,20 +18,20 @@ export function BranchConfigForm({ branches }: BranchConfigFormProps) {
           <Card key={b.id} className="border-border shadow-sm bg-card overflow-hidden">
             <CardHeader className="bg-muted/50 border-b pb-3 pt-4">
               <div className="flex items-center justify-between">
-                <Badge variant="outline" className="font-mono font-bold text-xs bg-card">
+                <Badge variant="outline" className="font-mono font-medium text-xs">
                   {b.kode}
                 </Badge>
                 {b.aktif ? (
-                  <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-[10px] hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 dark:hover:bg-emerald-950/50">
+                  <Badge variant="success" className="font-medium text-xs px-2.5 py-0.5 rounded-full">
                     Operasional Aktif
                   </Badge>
                 ) : (
-                  <Badge className="bg-muted text-muted-foreground border-border text-[10px]">
+                  <Badge variant="secondary" className="font-medium text-xs px-2.5 py-0.5 rounded-full">
                     Nonaktif
                   </Badge>
                 )}
               </div>
-              <CardTitle className="text-base font-bold text-foreground mt-2 font-serif">
+              <CardTitle className="text-base font-bold text-foreground mt-2">
                 {b.nama}
               </CardTitle>
             </CardHeader>

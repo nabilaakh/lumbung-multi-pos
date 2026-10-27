@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase/server';
 import { SignOutButton } from '@/components/auth/SignOutButton';
 import { BrandLogo } from '@/components/brand/brand-logo';
 import { Badge } from '@/components/ui/badge';
+import { ModeToggle } from '@/components/ui/mode-toggle';
+import { DashboardNav } from '@/components/ui/dashboard-nav';
 import {
   ShoppingCart,
   Clock,
@@ -56,58 +58,6 @@ export default async function DashboardLayout({
 
   const role = userProfile.peran;
 
-  // Filter Nav Items sesuai Matriks Akses Peran
-  const navItems = [
-    {
-      title: 'Kasir POS',
-      href: '/kasir',
-      icon: ShoppingCart,
-      roles: ['kasir'],
-    },
-    {
-      title: 'Shift Saya',
-      href: '/shift-saya',
-      icon: Clock,
-      roles: ['kasir'],
-    },
-    {
-      title: 'Riwayat Transaksi',
-      href: '/transaksi',
-      icon: Receipt,
-      roles: ['kasir', 'kepala_toko', 'owner'],
-    },
-    {
-      title: 'Stok Cabang',
-      href: '/stok',
-      icon: Layers,
-      roles: ['kepala_toko', 'owner'],
-    },
-    {
-      title: 'Shift Cabang',
-      href: '/shift-cabang',
-      icon: Users2,
-      roles: ['kepala_toko', 'owner'],
-    },
-    {
-      title: 'Master Produk',
-      href: '/produk',
-      icon: Package,
-      roles: ['kepala_toko', 'owner'],
-    },
-    {
-      title: 'Laporan & Analitik',
-      href: '/laporan',
-      icon: BarChart3,
-      roles: ['kepala_toko', 'owner'],
-    },
-    {
-      title: 'Pengaturan & Audit',
-      href: '/pengaturan',
-      icon: Settings,
-      roles: ['owner'],
-    },
-  ].filter((item) => item.roles.includes(role));
-
   const roleLabels: Record<string, string> = {
     kasir: 'Kasir',
     kepala_toko: 'Kepala Toko',
@@ -129,42 +79,37 @@ export default async function DashboardLayout({
               </Badge>
             ) : (
               <Badge variant="secondary" className="font-semibold text-xs px-2.5 py-0.5">
-                Kantor Pusat (Semua Cabang)
+                Pusat (Semua Cabang)
               </Badge>
             )}
           </div>
 
-          {/* User Profile & Sign Out */}
+          {/* User Profile & Action Controls (Sign Out & Toogle Mode) */}
           <div className="flex items-center gap-3">
-            <div className="hidden md:flex flex-col text-right">
+            {/* 1. Teks Profil Pengguna */}
+            <div className="flex flex-col text-right">
               <span className="text-sm font-semibold text-foreground leading-none">
                 {userProfile.nama_lengkap}
               </span>
-              <span className="text-xs text-muted-foreground mt-0.5">
+              <span className="text-xs text-muted-foreground mt-1">
                 {roleLabels[userProfile.peran] || userProfile.peran}
               </span>
             </div>
-            <SignOutButton />
+
+            {/* Garis pemisah vertikal tipis */}
+            <div className="h-6 w-px bg-border/70" />
+
+            {/* 2. Kelompok Tombol Aksi */}
+            <div className="flex items-center gap-1.5">
+              <ModeToggle />
+              <SignOutButton />
+            </div>
           </div>
         </div>
 
-        {/* Sub-Header Horizontal Navigation (Tablet & Desktop Optimized) */}
+        {/* Sub-Header Horizontal Navigation */}
         <div className="border-t border-border/50 bg-muted/30 overflow-x-auto scrollbar-none">
-          <div className="container mx-auto px-4 lg:px-6 flex items-center gap-1 py-1.5 min-w-max">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors hover:bg-card hover:text-foreground text-muted-foreground"
-                >
-                  <Icon className="h-4 w-4" />
-                  <span>{item.title}</span>
-                </Link>
-              );
-            })}
-          </div>
+          <DashboardNav role={role} />
         </div>
       </header>
 

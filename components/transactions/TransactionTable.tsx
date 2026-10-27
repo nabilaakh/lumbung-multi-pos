@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import type { TransactionWithDetails } from '@/lib/services/transaction-service';
+import type { Cabang } from '@/types/database';
 import {
   Table,
   TableBody,
@@ -13,13 +14,26 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Search, Eye, Ban, Filter, Receipt } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Search, Eye, Ban, Receipt, RefreshCw } from 'lucide-react';
 
 interface TransactionTableProps {
   transactions: TransactionWithDetails[];
   canVoid: boolean;
   onViewDetail: (transaksiId: string) => void;
   onOpenVoid: (trx: TransactionWithDetails) => void;
+  selectedBranchId?: string;
+  onSelectBranchId?: (id: string) => void;
+  branches?: Cabang[];
+  isOwner?: boolean;
+  onRefresh?: () => void;
+  isLoading?: boolean;
 }
 
 export function TransactionTable({
@@ -27,6 +41,12 @@ export function TransactionTable({
   canVoid,
   onViewDetail,
   onOpenVoid,
+  selectedBranchId = 'semua',
+  onSelectBranchId,
+  branches = [],
+  isOwner = false,
+  onRefresh,
+  isLoading = false,
 }: TransactionTableProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'semua' | 'lunas' | 'void'>('semua');
@@ -48,99 +68,96 @@ export function TransactionTable({
 
   return (
     <div className="space-y-4">
-      {/* Filter Bar */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-between items-stretch sm:items-center">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+      {/* Filter Bar Container */}
+      <div className="rounded-xl border border-border/60 bg-card p-3 shadow-xs flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+        <div className="relative flex-1 min-w-[200px] max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
           <Input
             type="search"
             placeholder="Cari nomor struk atau kasir..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 h-9 text-xs bg-card"
+            className="pl-9 h-10 text-sm bg-background/50 rounded-xl"
           />
         </div>
 
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
-          <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg border text-xs">
-            <span className="text-[11px] text-muted-foreground px-1.5 flex items-center gap-1 font-medium">
-              <Filter className="h-3 w-3" /> Status:
-            </span>
-            <Button
-              type="button"
-              variant={statusFilter === 'semua' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setStatusFilter('semua')}
-              className="h-7 text-xs px-2.5"
-            >
-              Semua
-            </Button>
-            <Button
-              type="button"
-              variant={statusFilter === 'lunas' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setStatusFilter('lunas')}
-              className="h-7 text-xs px-2.5 text-emerald-600 dark:text-emerald-400"
-            >
-              Lunas
-            </Button>
-            <Button
-              type="button"
-              variant={statusFilter === 'void' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setStatusFilter('void')}
-              className="h-7 text-xs px-2.5 text-destructive"
-            >
-              Void
-            </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Cabang Filter untuk Owner */}
+          {isOwner && branches.length > 0 && onSelectBranchId && (
+            <div className="w-[160px]">
+              <Select value={selectedBranchId} onValueChange={onSelectBranchId}>
+                <SelectTrigger className="h-10 text-sm rounded-xl">
+                  <SelectValue placeholder="Semua Cabang" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="semua">Semua Cabang</SelectItem>
+                  {branches.map((b) => (
+                    <SelectItem key={b.id} value={b.id}>
+                      {b.kode} - {b.nama}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {/* Filter Status */}
+          <div className="w-[140px]">
+            <Select value={statusFilter} onValueChange={(val) => setStatusFilter(val as any)}>
+              <SelectTrigger className="h-10 text-sm rounded-xl">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="semua">Semua Status</SelectItem>
+                <SelectItem value="lunas">Lunas</SelectItem>
+                <SelectItem value="void">Void</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
-          <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg border text-xs">
-            <span className="text-[11px] text-muted-foreground px-1.5 font-medium">Bayar:</span>
-            <Button
-              type="button"
-              variant={methodFilter === 'semua' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setMethodFilter('semua')}
-              className="h-7 text-xs px-2.5"
-            >
-              Semua
-            </Button>
-            <Button
-              type="button"
-              variant={methodFilter === 'tunai' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setMethodFilter('tunai')}
-              className="h-7 text-xs px-2.5 uppercase"
-            >
-              Tunai
-            </Button>
-            <Button
-              type="button"
-              variant={methodFilter === 'qris' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setMethodFilter('qris')}
-              className="h-7 text-xs px-2.5 uppercase"
-            >
-              QRIS
-            </Button>
+          {/* Filter Metode Bayar */}
+          <div className="w-[140px]">
+            <Select value={methodFilter} onValueChange={(val) => setMethodFilter(val as any)}>
+              <SelectTrigger className="h-10 text-sm rounded-xl">
+                <SelectValue placeholder="Metode" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="semua">Semua Metode</SelectItem>
+                <SelectItem value="tunai">Tunai</SelectItem>
+                <SelectItem value="qris">QRIS</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
+
+          {/* Tombol Refresh */}
+          {onRefresh && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onRefresh}
+              disabled={isLoading}
+              className="h-10 px-3 text-sm rounded-xl"
+            >
+              <RefreshCw className={`h-4 w-4 mr-1.5 ${isLoading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+          )}
         </div>
       </div>
 
       {/* Tabel Transaksi */}
-      <div className="rounded-xl border bg-card shadow-xs overflow-hidden">
+      <div className="rounded-xl border border-border bg-card shadow-xs overflow-hidden">
         <Table>
-          <TableHeader className="bg-muted/40">
-            <TableRow>
-              <TableHead className="text-xs font-semibold">Nomor Struk</TableHead>
-              <TableHead className="text-xs font-semibold">Waktu</TableHead>
-              <TableHead className="text-xs font-semibold">Cabang</TableHead>
-              <TableHead className="text-xs font-semibold">Kasir</TableHead>
-              <TableHead className="text-xs font-semibold text-right">Total Transaksi</TableHead>
-              <TableHead className="text-xs font-semibold text-center">Metode</TableHead>
-              <TableHead className="text-xs font-semibold text-center">Status</TableHead>
-              <TableHead className="text-xs font-semibold text-right">Aksi</TableHead>
+          <TableHeader>
+            <TableRow className="bg-muted/40 border-b border-border/60 hover:bg-muted/40">
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Nomor Struk</TableHead>
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Waktu</TableHead>
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Cabang</TableHead>
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Kasir</TableHead>
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-right">Total Transaksi</TableHead>
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-center">Metode</TableHead>
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-center">Status</TableHead>
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-right">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -153,11 +170,11 @@ export function TransactionTable({
               </TableRow>
             ) : (
               filtered.map((trx) => (
-                <TableRow key={trx.id} className="text-xs hover:bg-muted/30">
-                  <TableCell className="font-mono font-bold text-foreground">
+                <TableRow key={trx.id} className="border-b border-border/40 hover:bg-muted/30 transition-colors py-3 px-4 text-sm">
+                  <TableCell className="py-3 px-4 font-mono font-medium text-foreground">
                     {trx.nomor_struk}
                   </TableCell>
-                  <TableCell className="text-muted-foreground whitespace-nowrap">
+                  <TableCell className="py-3 px-4 text-muted-foreground whitespace-nowrap">
                     {new Date(trx.dibuat_pada).toLocaleString('id-ID', {
                       day: 'numeric',
                       month: 'short',
@@ -165,55 +182,53 @@ export function TransactionTable({
                       minute: '2-digit',
                     })}
                   </TableCell>
-                  <TableCell className="font-medium">
+                  <TableCell className="py-3 px-4 font-medium">
                     {trx.cabang?.kode || '-'}
                   </TableCell>
-                  <TableCell className="text-muted-foreground">
+                  <TableCell className="py-3 px-4 text-muted-foreground">
                     {trx.kasir?.nama_lengkap || '-'}
                   </TableCell>
-                  <TableCell className="text-right font-bold text-foreground">
+                  <TableCell className="py-3 px-4 text-right font-semibold text-foreground">
                     Rp{trx.total.toLocaleString('id-ID')}
                   </TableCell>
-                  <TableCell className="text-center">
-                    <Badge variant="outline" className="text-[10px] uppercase px-1.5 py-0 font-medium">
+                  <TableCell className="py-3 px-4 text-center">
+                    <Badge variant="outline" className="font-medium text-xs px-2.5 py-0.5 rounded-full uppercase">
                       {trx.metode_bayar}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-center">
+                  <TableCell className="py-3 px-4 text-center">
                     <Badge
-                      variant={trx.status === 'lunas' ? 'default' : 'destructive'}
-                      className={
-                        trx.status === 'lunas'
-                          ? 'bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] px-2 py-0.5'
-                          : 'bg-destructive text-white text-[10px] px-2 py-0.5'
-                      }
+                      variant={trx.status === 'lunas' ? 'success' : 'destructive'}
+                      className="font-medium text-xs px-2.5 py-0.5 rounded-full uppercase"
                     >
-                      {trx.status.toUpperCase()}
+                      {trx.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-1.5">
+                  <TableCell className="py-3 px-4 text-right">
+                    <div className="flex items-center justify-end gap-1">
                       <Button
                         type="button"
                         variant="ghost"
-                        size="sm"
+                        size="icon"
+                        title="Lihat Detail"
                         onClick={() => onViewDetail(trx.id)}
-                        className="h-7 px-2 text-xs hover:bg-muted text-foreground"
+                        className="h-8 w-8 rounded-md text-muted-foreground hover:text-primary"
                       >
-                        <Eye className="h-3.5 w-3.5 mr-1" />
-                        Detail
+                        <Eye className="h-4 w-4" />
+                        <span className="sr-only">Lihat Detail</span>
                       </Button>
 
                       {canVoid && trx.status === 'lunas' && (
                         <Button
                           type="button"
                           variant="ghost"
-                          size="sm"
+                          size="icon"
+                          title="Void Transaksi"
                           onClick={() => onOpenVoid(trx)}
-                          className="h-7 px-2 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive"
+                          className="h-8 w-8 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                         >
-                          <Ban className="h-3.5 w-3.5 mr-1" />
-                          Void
+                          <Ban className="h-4 w-4" />
+                          <span className="sr-only">Void</span>
                         </Button>
                       )}
                     </div>

@@ -1,43 +1,42 @@
-'use client';
+"use client"
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
-import { Button } from '@/components/ui/button';
-import { LogOut } from 'lucide-react';
+import React, { useState } from "react"
+import { useRouter } from "next/navigation"
+import { createClient } from "@/lib/supabase/client"
+import { Button } from "@/components/ui/button"
+import { LogOut, Loader2 } from "lucide-react"
 
-interface SignOutButtonProps {
-  className?: string;
-  variant?: 'outline' | 'default' | 'ghost' | 'destructive';
-}
-
-export function SignOutButton({ className, variant = 'outline' }: SignOutButtonProps) {
-  const router = useRouter();
-  const supabase = createClient();
-  const [isLoading, setIsLoading] = useState(false);
+export function SignOutButton() {
+  const router = useRouter()
+  const supabase = createClient()
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleSignOut = async () => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
-      await supabase.auth.signOut();
-      router.push('/login');
-      router.refresh();
+      await supabase.auth.signOut()
+      router.push("/login")
+      router.refresh()
     } catch (error) {
-      console.error('Error signing out:', error);
-      setIsLoading(false);
+      console.error("Error signing out:", error)
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <Button
-      variant={variant}
-      size="sm"
+      variant="ghost"
+      size="icon"
       onClick={handleSignOut}
       disabled={isLoading}
-      className={className}
+      aria-label="Keluar"
+      className="h-9 w-9 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10"
     >
-      <LogOut className="h-4 w-4 mr-2" />
-      {isLoading ? 'Keluar...' : 'Keluar'}
+      {isLoading ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        <LogOut className="h-4 w-4" />
+      )}
     </Button>
-  );
+  )
 }

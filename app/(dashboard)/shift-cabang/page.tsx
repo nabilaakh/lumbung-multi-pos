@@ -62,11 +62,10 @@ export default function ShiftCabangPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground font-serif flex items-center gap-2">
-            <ShieldCheck className="w-6 h-6 text-primary" />
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Supervisi Shift Kasir
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground mt-1">
             Verifikasi rekonsiliasi kas shift (BR-10), pemantauan selisih kas fisik vs sistem, dan persetujuan supervisor.
           </p>
         </div>

@@ -98,10 +98,10 @@ export default function ShiftSayaPage() {
       {/* Header Halaman */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground font-serif">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Shift Kerja Saya
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground mt-1">
             Kelola pembukaan sesi kasir, pantau kas laci, dan rekonsiliasi kas saat tutup toko.
           </p>
         </div>
@@ -122,7 +122,7 @@ export default function ShiftSayaPage() {
             )
           ) : (
             <div className="flex items-center gap-2.5">
-              <Button asChild className="h-11 px-5 shadow-sm font-medium">
+              <Button asChild className="h-10 px-4 rounded-xl shadow-xs font-medium">
                 <Link href="/kasir">
                   <ShoppingBag className="h-4 w-4 mr-2" />
                   Mulai Kasir POS
@@ -149,7 +149,7 @@ export default function ShiftSayaPage() {
           />
         </div>
       ) : (
-        <Card className="border-dashed border-2 border-border/80 bg-muted/20">
+        <Card className="rounded-xl border-dashed border-2 border-border/80 bg-muted/20">
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
             <div className="h-14 w-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4">
               <Clock className="h-7 w-7" />
@@ -170,21 +170,20 @@ export default function ShiftSayaPage() {
       )}
 
       {/* Riwayat Shift Sebelumnya */}
-      <Card className="border-border">
-        <CardHeader className="pb-3">
+      <Card className="rounded-xl border border-border bg-card shadow-xs overflow-hidden">
+        <CardHeader className="pb-3 border-b border-border/60 bg-muted/30">
           <div className="flex items-center gap-2">
-            <History className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-base font-semibold">Riwayat Sesi Shift Terakhir</CardTitle>
+            <CardTitle className="text-base font-semibold text-foreground">Riwayat Sesi Shift Terakhir</CardTitle>
           </div>
-          <CardDescription className="text-xs">
+          <CardDescription className="text-xs text-muted-foreground mt-0.5">
             Daftar 5 sesi shift terakhir yang Anda jalankan.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4">
           {recentShifts.length === 0 ? (
-            <p className="text-xs text-muted-foreground text-center py-4">Belum ada riwayat shift.</p>
+            <p className="text-sm text-muted-foreground text-center py-6">Belum ada riwayat shift.</p>
           ) : (
-            <div className="divide-y divide-border/60">
+            <div className="divide-y divide-border/40">
               {recentShifts.map((sh) => (
                 <div key={sh.id} className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm">
                   <div>
@@ -197,14 +196,14 @@ export default function ShiftSayaPage() {
                         })}
                       </span>
                       <Badge
-                        variant="outline"
-                        className={
+                        variant={
                           sh.status === 'buka'
-                            ? 'text-blue-700 border-blue-300 bg-blue-50 dark:text-blue-300 dark:border-blue-800 dark:bg-blue-950/30'
+                            ? 'default'
                             : sh.status === 'diverifikasi'
-                            ? 'text-emerald-700 border-emerald-300 bg-emerald-50 dark:text-emerald-300 dark:border-emerald-800 dark:bg-emerald-950/30'
-                            : 'text-amber-700 border-amber-300 bg-amber-50 dark:text-amber-300 dark:border-amber-800 dark:bg-amber-950/30'
+                            ? 'success'
+                            : 'warning'
                         }
+                        className="font-medium text-xs px-2.5 py-0.5 rounded-full capitalize"
                       >
                         {sh.status}
                       </Badge>
@@ -226,7 +225,7 @@ export default function ShiftSayaPage() {
                     </div>
                     <div>
                       <span className="text-muted-foreground">Selisih:</span>
-                      <p className={`font-medium ${(sh.selisih ?? 0) === 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'}`}>
+                      <p className={`font-semibold ${(sh.selisih ?? 0) === 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'}`}>
                         Rp{(sh.selisih ?? 0).toLocaleString('id-ID')}
                       </p>
                     </div>

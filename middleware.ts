@@ -29,6 +29,11 @@ export async function middleware(request: NextRequest) {
 
   // 1. Kasus Belum Login
   if (!user) {
+    // Jika akses root '/' langsung lempar ke login
+    if (pathname === '/') {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+    
     if (isProtectedPath) {
       const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('redirectTo', pathname);

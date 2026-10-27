@@ -81,52 +81,12 @@ export default function TransaksiPage() {
       {/* Header Halaman */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground font-serif">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Riwayat Penjualan & Transaksi
           </h1>
-          <p className="text-sm text-muted-foreground">
-            Daftar seluruh struk transaksi, rincian pembayaran, dan pembatalan (*void*) terverifikasi.
+          <p className="text-sm text-muted-foreground mt-1">
+            Daftar seluruh struk transaksi, rincian pembayaran, dan pembatalan (void) terverifikasi.
           </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {/* Filter Cabang untuk Owner */}
-          {profile?.peran === 'owner' && (
-            <div className="flex items-center gap-1.5 bg-card p-1 rounded-lg border text-xs">
-              <Store className="h-3.5 w-3.5 text-muted-foreground ml-1.5" />
-              <Button
-                variant={selectedBranchId === 'semua' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setSelectedBranchId('semua')}
-                className="h-7 text-xs px-2.5"
-              >
-                Semua Cabang
-              </Button>
-              {allBranches.map((cb) => (
-                <Button
-                  key={cb.id}
-                  variant={selectedBranchId === cb.id ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setSelectedBranchId(cb.id)}
-                  className="h-7 text-xs px-2.5"
-                >
-                  {cb.kode}
-                </Button>
-              ))}
-            </div>
-          )}
-
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={loadData}
-            disabled={isLoading}
-            className="h-9 px-3 text-xs"
-          >
-            <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${isLoading ? 'animate-spin' : ''}`} />
-            Segarkan
-          </Button>
         </div>
       </div>
 
@@ -136,6 +96,12 @@ export default function TransaksiPage() {
         canVoid={canVoid}
         onViewDetail={(id) => setDetailModalId(id)}
         onOpenVoid={(trx) => setVoidTarget(trx)}
+        selectedBranchId={selectedBranchId}
+        onSelectBranchId={setSelectedBranchId}
+        branches={allBranches}
+        isOwner={profile?.peran === 'owner'}
+        onRefresh={loadData}
+        isLoading={isLoading}
       />
 
       {/* Modal Detail Transaksi */}

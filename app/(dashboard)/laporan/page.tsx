@@ -21,6 +21,13 @@ import { ProfitSection } from '@/components/reports/ProfitSection';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   BarChart,
   Building2,
   Calendar,
@@ -154,64 +161,50 @@ export default function LaporanPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground font-serif flex items-center gap-2">
-            <BarChart className="w-6 h-6 text-primary" />
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Laporan & Analitik Penjualan
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground mt-1">
             Pemantauan omzet, kinerja kasir, transaksi QRIS vs tunai, dan metrik profitabilitas bisnis.
           </p>
         </div>
-
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={loadData}
-            disabled={isLoading}
-            className="text-xs h-9 gap-1.5 text-foreground"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-            Perbarui Data
-          </Button>
-        </div>
       </div>
 
-      {/* Filter and Date Bar */}
-      <div className="bg-card p-4 rounded-xl border border-border shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+      {/* Filter Bar Container */}
+      <div className="rounded-xl border border-border/60 bg-card p-3 shadow-xs flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
         <div className="flex items-center gap-2 flex-wrap">
           {/* Branch filter */}
           {isOwner ? (
-            <div className="flex items-center gap-1.5 bg-muted/50 px-2.5 py-1 rounded-md border border-border">
-              <Building2 className="w-3.5 h-3.5 text-muted-foreground" />
-              <select
-                value={selectedBranch}
-                onChange={(e) => setSelectedBranch(e.target.value)}
-                className="bg-transparent text-xs text-foreground font-semibold focus:outline-none"
-              >
-                <option value="all">Semua Cabang (Konsolidasi)</option>
-                {branches.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.kode} - {b.nama}
-                  </option>
-                ))}
-              </select>
+            <div className="w-[200px]">
+              <Select value={selectedBranch} onValueChange={setSelectedBranch}>
+                <SelectTrigger className="h-10 text-sm rounded-xl">
+                  <SelectValue placeholder="Semua Cabang" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Cabang (Konsolidasi)</SelectItem>
+                  {branches.map((b) => (
+                    <SelectItem key={b.id} value={b.id}>
+                      {b.kode} - {b.nama}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           ) : (
-            <div className="flex items-center gap-1.5 bg-muted px-3 py-1.5 rounded-md text-xs font-bold text-foreground border border-border">
-              <Building2 className="w-3.5 h-3.5 text-muted-foreground" />
-              Cabang: {branchName}
+            <div className="flex items-center gap-1.5 bg-muted/40 px-3 h-10 rounded-xl text-xs font-medium text-foreground border border-border/60">
+              <Building2 className="w-4 h-4 text-muted-foreground" />
+              <span>Cabang: {branchName}</span>
             </div>
           )}
 
           {/* Date presets */}
-          <div className="flex items-center gap-1 bg-muted p-1 rounded-lg border border-border text-xs">
+          <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-xl border border-border/60 text-xs">
             <button
               type="button"
               onClick={() => handleDatePreset('today')}
-              className={`px-2.5 py-1 rounded text-xs font-semibold transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 datePreset === 'today'
-                  ? 'bg-card text-foreground shadow-sm'
+                  ? 'bg-card text-foreground shadow-xs font-semibold'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -220,9 +213,9 @@ export default function LaporanPage() {
             <button
               type="button"
               onClick={() => handleDatePreset('7days')}
-              className={`px-2.5 py-1 rounded text-xs font-semibold transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 datePreset === '7days'
-                  ? 'bg-card text-foreground shadow-sm'
+                  ? 'bg-card text-foreground shadow-xs font-semibold'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -231,9 +224,9 @@ export default function LaporanPage() {
             <button
               type="button"
               onClick={() => handleDatePreset('30days')}
-              className={`px-2.5 py-1 rounded text-xs font-semibold transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 datePreset === '30days'
-                  ? 'bg-card text-foreground shadow-sm'
+                  ? 'bg-card text-foreground shadow-xs font-semibold'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -242,9 +235,9 @@ export default function LaporanPage() {
             <button
               type="button"
               onClick={() => handleDatePreset('all')}
-              className={`px-2.5 py-1 rounded text-xs font-semibold transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 datePreset === 'all'
-                  ? 'bg-card text-foreground shadow-sm'
+                  ? 'bg-card text-foreground shadow-xs font-semibold'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -253,28 +246,40 @@ export default function LaporanPage() {
           </div>
         </div>
 
-        {/* Custom date range inputs */}
-        <div className="flex items-center gap-2 text-xs">
-          <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
-          <Input
-            type="date"
-            value={startDate}
-            onChange={(e) => {
-              setStartDate(e.target.value);
-              setDatePreset('all');
-            }}
-            className="h-8 text-xs w-32 bg-muted/50"
-          />
-          <span className="text-muted-foreground">-</span>
-          <Input
-            type="date"
-            value={endDate}
-            onChange={(e) => {
-              setEndDate(e.target.value);
-              setDatePreset('all');
-            }}
-            className="h-8 text-xs w-32 bg-muted/50"
-          />
+        {/* Custom date range inputs and Refresh button */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5">
+            <Calendar className="w-4 h-4 text-muted-foreground" />
+            <Input
+              type="date"
+              value={startDate}
+              onChange={(e) => {
+                setStartDate(e.target.value);
+                setDatePreset('all');
+              }}
+              className="h-10 text-sm w-36 bg-background/50 rounded-xl"
+            />
+            <span className="text-muted-foreground">-</span>
+            <Input
+              type="date"
+              value={endDate}
+              onChange={(e) => {
+                setEndDate(e.target.value);
+                setDatePreset('all');
+              }}
+              className="h-10 text-sm w-36 bg-background/50 rounded-xl"
+            />
+          </div>
+
+          <Button
+            variant="outline"
+            onClick={loadData}
+            disabled={isLoading}
+            className="h-10 px-3 text-sm rounded-xl"
+          >
+            <RefreshCw className={`w-4 h-4 mr-1.5 ${isLoading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
         </div>
       </div>
 

@@ -22,8 +22,7 @@ export function ProfitSection({ profitMetrics, userRole }: ProfitSectionProps) {
       <CardHeader className="pb-3 border-b border-border flex flex-row items-center justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-primary" />
-            <CardTitle className="text-base font-bold text-foreground font-serif">
+            <CardTitle className="text-base font-bold text-foreground">
               Analisis Laba Kotor & Margin Bisnis
             </CardTitle>
           </div>
@@ -81,7 +80,7 @@ export function ProfitSection({ profitMetrics, userRole }: ProfitSectionProps) {
               <TrendingUp className="w-3.5 h-3.5 text-primary" />
               Margin Laba Kotor
             </span>
-            <div className="text-2xl font-bold font-serif text-primary">
+            <div className="text-2xl font-bold text-primary">
               {profitMetrics.profitMarginPercent.toFixed(1)}%
             </div>
             <span className="text-[10px] text-muted-foreground">

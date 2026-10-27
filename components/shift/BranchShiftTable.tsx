@@ -12,6 +12,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   ShiftSupervisionItem,
   isHighCashVariance,
   formatVarianceDisplay,
@@ -140,72 +147,74 @@ export function BranchShiftTable({
         )}
       </div>
 
-      {/* Filter and Action Bar */}
-      <div className="bg-card p-4 rounded-xl border border-border shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
-        <div className="flex flex-1 items-center gap-2.5 flex-wrap">
+      {/* Filter and Action Bar Container */}
+      <div className="rounded-xl border border-border/60 bg-card p-3 shadow-xs flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+        <div className="flex flex-wrap items-center gap-2">
           {/* Status select */}
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            className="h-9 px-3 rounded-md border border-border bg-muted/50 text-xs text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            <option value="all">Semua Status Shift</option>
-            <option value="ditutup">Menunggu Verifikasi (Ditutup)</option>
-            <option value="diverifikasi">Sudah Diverifikasi</option>
-            <option value="buka">Masih Aktif (Buka)</option>
-          </select>
+          <div className="w-[200px]">
+            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+              <SelectTrigger className="h-10 text-sm rounded-xl">
+                <SelectValue placeholder="Status Shift" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Status Shift</SelectItem>
+                <SelectItem value="ditutup">Menunggu Verifikasi</SelectItem>
+                <SelectItem value="diverifikasi">Sudah Diverifikasi</SelectItem>
+                <SelectItem value="buka">Masih Aktif (Buka)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
           {/* Branch selector */}
           {userRole === 'owner' ? (
-            <div className="flex items-center gap-1.5 bg-muted/50 px-2.5 py-1 rounded-md border border-border">
-              <Building2 className="w-3.5 h-3.5 text-muted-foreground" />
-              <select
-                value={selectedCabang}
-                onChange={(e) => setSelectedCabang(e.target.value)}
-                className="bg-transparent text-xs text-foreground font-medium focus:outline-none"
-              >
-                <option value="all">Semua Cabang</option>
-                {cabangList.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.kode} - {c.nama}
-                  </option>
-                ))}
-              </select>
+            <div className="w-[180px]">
+              <Select value={selectedCabang} onValueChange={setSelectedCabang}>
+                <SelectTrigger className="h-10 text-sm rounded-xl">
+                  <SelectValue placeholder="Semua Cabang" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Cabang</SelectItem>
+                  {cabangList.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.kode} - {c.nama}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           ) : (
-            <div className="flex items-center gap-1.5 bg-muted px-3 py-1.5 rounded-md text-xs font-semibold text-foreground border border-border">
-              <Building2 className="w-3.5 h-3.5 text-muted-foreground" />
-              Cabang: {cabangList.find((c) => c.id === userCabangId)?.nama || 'Cabang Saya'}
+            <div className="flex items-center gap-1.5 bg-muted/40 px-3 h-10 rounded-xl text-xs font-medium text-foreground border border-border/60">
+              <Building2 className="w-4 h-4 text-muted-foreground" />
+              <span>Cabang: {cabangList.find((c) => c.id === userCabangId)?.nama || 'Cabang Saya'}</span>
             </div>
           )}
         </div>
 
         <Button
           variant="outline"
-          size="sm"
           onClick={onRefresh}
           disabled={loading}
-          className="text-xs h-9 gap-1.5 text-muted-foreground"
+          className="h-10 px-3 text-sm rounded-xl"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-          Refresh Data
+          <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ? 'animate-spin' : ''}`} />
+          Refresh
         </Button>
       </div>
 
       {/* Shift Table */}
-      <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+      <div className="rounded-xl border border-border bg-card shadow-xs overflow-hidden">
         <Table>
-          <TableHeader className="bg-muted/50">
-            <TableRow>
-              <TableHead className="text-xs font-bold text-muted-foreground">Waktu Buka</TableHead>
-              <TableHead className="text-xs font-bold text-muted-foreground">Kasir</TableHead>
-              <TableHead className="text-xs font-bold text-muted-foreground">Cabang</TableHead>
-              <TableHead className="text-xs font-bold text-muted-foreground text-right">Kas Awal</TableHead>
-              <TableHead className="text-xs font-bold text-muted-foreground text-right">Penjualan Tunai</TableHead>
-              <TableHead className="text-xs font-bold text-muted-foreground text-right">Kas Fisik</TableHead>
-              <TableHead className="text-xs font-bold text-muted-foreground text-right">Selisih Kas</TableHead>
-              <TableHead className="text-xs font-bold text-muted-foreground text-center">Status</TableHead>
-              <TableHead className="text-xs font-bold text-muted-foreground text-right">Aksi</TableHead>
+          <TableHeader>
+            <TableRow className="bg-muted/40 border-b border-border/60 hover:bg-muted/40">
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Waktu Buka</TableHead>
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Kasir</TableHead>
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Cabang</TableHead>
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-right">Kas Awal</TableHead>
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-right">Penjualan Tunai</TableHead>
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-right">Kas Fisik</TableHead>
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-right">Selisih Kas</TableHead>
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-center">Status</TableHead>
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-right">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -217,23 +226,20 @@ export function BranchShiftTable({
               </TableRow>
             ) : filteredShifts.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-8 text-xs text-muted-foreground">
+                <TableCell colSpan={9} className="text-center py-12 text-sm text-muted-foreground">
                   Tidak ada data shift yang sesuai dengan filter.
                 </TableCell>
               </TableRow>
             ) : (
               filteredShifts.map((shift) => {
                 const isHighVariance = isHighCashVariance(shift.selisih);
-                const varianceInfo = formatVarianceDisplay(shift.selisih);
 
                 return (
                   <TableRow
                     key={shift.id}
-                    className={`hover:bg-muted/40 transition-colors ${
-                      isHighVariance ? 'bg-rose-50/30 dark:bg-rose-950/20' : ''
-                    }`}
+                    className="border-b border-border/40 hover:bg-muted/30 transition-colors py-3 px-4 text-sm"
                   >
-                    <TableCell className="font-mono text-xs text-foreground whitespace-nowrap">
+                    <TableCell className="py-3 px-4 font-mono text-xs text-foreground whitespace-nowrap">
                       {new Date(shift.waktu_buka).toLocaleDateString('id-ID', {
                         day: '2-digit',
                         month: 'short',
@@ -243,29 +249,29 @@ export function BranchShiftTable({
                         minute: '2-digit',
                       })}
                     </TableCell>
-                    <TableCell className="text-xs font-semibold text-foreground">
+                    <TableCell className="py-3 px-4 font-medium text-foreground">
                       {shift.kasir?.nama_lengkap || 'Kasir'}
                     </TableCell>
-                    <TableCell className="text-xs text-foreground">
-                      <span className="font-bold">{shift.cabang?.kode}</span>
+                    <TableCell className="py-3 px-4 text-xs text-foreground font-semibold">
+                      {shift.cabang?.kode}
                     </TableCell>
-                    <TableCell className="text-right font-mono text-xs text-muted-foreground">
+                    <TableCell className="py-3 px-4 text-right font-mono text-muted-foreground">
                       Rp {shift.kas_awal.toLocaleString('id-ID')}
                     </TableCell>
-                    <TableCell className="text-right font-mono text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+                    <TableCell className="py-3 px-4 text-right font-mono font-semibold text-emerald-700 dark:text-emerald-400">
                       Rp {shift.total_penjualan_tunai.toLocaleString('id-ID')}
                     </TableCell>
-                    <TableCell className="text-right font-mono text-xs text-foreground">
+                    <TableCell className="py-3 px-4 text-right font-mono text-foreground font-semibold">
                       {shift.kas_aktual !== null
                         ? `Rp ${shift.kas_aktual.toLocaleString('id-ID')}`
                         : '-'}
                     </TableCell>
-                    <TableCell className="text-right whitespace-nowrap">
+                    <TableCell className="py-3 px-4 text-right whitespace-nowrap">
                       {shift.selisih !== null ? (
                         <span
-                          className={`font-mono text-xs font-bold px-2 py-0.5 rounded ${
+                          className={`font-mono text-xs font-bold px-2 py-0.5 rounded-full ${
                             isHighVariance
-                              ? 'text-rose-700 bg-rose-100 dark:text-rose-300 dark:bg-rose-950/40'
+                              ? 'text-destructive bg-destructive/10'
                               : shift.selisih === 0
                               ? 'text-emerald-700 bg-emerald-50 dark:text-emerald-300 dark:bg-emerald-950/30'
                               : 'text-primary bg-primary/10'
@@ -278,40 +284,44 @@ export function BranchShiftTable({
                         <span className="text-muted-foreground text-xs">-</span>
                       )}
                     </TableCell>
-                    <TableCell className="text-center">
-                      {shift.status === 'diverifikasi' ? (
-                        <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-[10px] hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 dark:hover:bg-emerald-950/50">
-                          Diverifikasi
-                        </Badge>
-                      ) : shift.status === 'ditutup' ? (
-                        <Badge className="bg-amber-100 text-amber-800 border-amber-300 text-[10px] hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800 dark:hover:bg-amber-950/50">
-                          Menunggu Verifikasi
-                        </Badge>
-                      ) : (
-                        <Badge className="bg-blue-100 text-blue-800 border-blue-300 text-[10px] hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800 dark:hover:bg-blue-950/50">
-                          Shift Buka
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        size="sm"
-                        variant={shift.status === 'ditutup' ? 'default' : 'outline'}
-                        onClick={() => setSelectedShiftForDetail(shift)}
-                        className="text-xs h-8 font-semibold"
+                    <TableCell className="py-3 px-4 text-center">
+                      <Badge
+                        variant={
+                          shift.status === 'diverifikasi'
+                            ? 'success'
+                            : shift.status === 'ditutup'
+                            ? 'warning'
+                            : 'default'
+                        }
+                        className="font-medium text-xs px-2.5 py-0.5 rounded-full"
                       >
-                        {shift.status === 'ditutup' ? (
-                          <>
-                            <ShieldCheck className="w-3.5 h-3.5 mr-1" />
-                            Verifikasi
-                          </>
-                        ) : (
-                          <>
-                            <Eye className="w-3.5 h-3.5 mr-1" />
-                            Detail
-                          </>
-                        )}
-                      </Button>
+                        {shift.status === 'ditutup' ? 'Menunggu' : shift.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="py-3 px-4 text-right">
+                      {shift.status === 'ditutup' && (userRole === 'owner' || userRole === 'kepala_toko') ? (
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => setSelectedShiftForDetail(shift)}
+                          title="Verifikasi Shift"
+                          className="h-8 w-8 rounded-md text-primary hover:bg-primary/10"
+                        >
+                          <ShieldCheck className="h-4 w-4" />
+                          <span className="sr-only">Verifikasi</span>
+                        </Button>
+                      ) : (
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => setSelectedShiftForDetail(shift)}
+                          title="Lihat Detail Shift"
+                          className="h-8 w-8 rounded-md text-muted-foreground hover:text-foreground"
+                        >
+                          <Eye className="h-4 w-4" />
+                          <span className="sr-only">Detail</span>
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 );
