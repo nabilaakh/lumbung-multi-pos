@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Table,
   TableHeader,
@@ -25,6 +25,7 @@ import {
 } from '@/lib/services/stock-service';
 import { VerifyShiftModal } from './VerifyShiftModal';
 import { LoadingState } from '@/components/ui/loading-state';
+import { DataTablePagination } from '@/components/ui/data-table-pagination';
 import {
   ShieldCheck,
   AlertTriangle,
@@ -60,6 +61,13 @@ export function BranchShiftTable({
   const [selectedShiftForDetail, setSelectedShiftForDetail] = useState<ShiftSupervisionItem | null>(
     null
   );
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  // Reset pagination when filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCabang, selectedStatus, highVarianceOnly]);
 
   const filteredShifts = useMemo(() => {
     return shiftList.filter((shift) => {
@@ -81,6 +89,12 @@ export function BranchShiftTable({
       return true;
     });
   }, [shiftList, selectedCabang, selectedStatus, highVarianceOnly]);
+
+  const totalPages = Math.ceil(filteredShifts.length / pageSize) || 1;
+  const paginatedShifts = filteredShifts.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
   const pendingVerificationCount = useMemo(() => {
     return shiftList.filter((s) => s.status === 'ditutup').length;
@@ -231,7 +245,7 @@ export function BranchShiftTable({
                 </TableCell>
               </TableRow>
             ) : (
-              filteredShifts.map((shift) => {
+              paginatedShifts.map((shift) => {
                 const isHighVariance = isHighCashVariance(shift.selisih);
 
                 return (
@@ -329,6 +343,15 @@ export function BranchShiftTable({
             )}
           </TableBody>
         </Table>
+
+        <DataTablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          pageSize={pageSize}
+          totalItems={filteredShifts.length}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={setPageSize}
+        />
       </div>
 
       {/* Verify / Detail Modal */}

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Table,
   TableHeader,
@@ -24,6 +24,7 @@ import {
   updateStaffStatus,
   updateStaffRoleAndBranch,
 } from '@/lib/services/settings-service';
+import { DataTablePagination } from '@/components/ui/data-table-pagination';
 import {
   Search,
   Loader2,
@@ -84,6 +85,14 @@ export function StaffManagementTable({
     }
   };
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  // Reset pagination when search or filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, roleFilter, branchFilter]);
+
   const filteredStaff = useMemo(() => {
     return staffList.filter((s) => {
       if (roleFilter !== 'all' && s.peran !== roleFilter) return false;
@@ -97,6 +106,12 @@ export function StaffManagementTable({
       return true;
     });
   }, [staffList, roleFilter, branchFilter, search]);
+
+  const totalPages = Math.ceil(filteredStaff.length / pageSize) || 1;
+  const paginatedStaff = filteredStaff.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
   const handleToggleStatus = async (staff: ProfilPengguna) => {
     if (!isOwner) return;
@@ -265,7 +280,7 @@ export function StaffManagementTable({
                 </TableCell>
               </TableRow>
             ) : (
-              filteredStaff.map((staff) => {
+              paginatedStaff.map((staff) => {
                 const branchObj = branches.find((b) => b.id === staff.cabang_id);
                 const isStaffOwner = staff.peran === 'owner';
 
@@ -390,6 +405,15 @@ export function StaffManagementTable({
             )}
           </TableBody>
         </Table>
+
+        <DataTablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          pageSize={pageSize}
+          totalItems={filteredStaff.length}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={setPageSize}
+        />
       </div>
 
       {/* Modal 1: Edit Staff Modal ("Atur Penempatan & Peran Staf") */}

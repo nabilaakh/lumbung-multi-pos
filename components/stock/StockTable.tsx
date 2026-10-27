@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Table,
   TableHeader,
@@ -22,6 +22,7 @@ import {
 import { StockItem, isLowStock } from '@/lib/services/stock-service';
 import { StockAdjustmentModal } from './StockAdjustmentModal';
 import { LoadingState } from '@/components/ui/loading-state';
+import { DataTablePagination } from '@/components/ui/data-table-pagination';
 import {
   Search,
   AlertTriangle,
@@ -65,6 +66,13 @@ export function StockTable({
   );
   const [filterLowStockOnly, setFilterLowStockOnly] = useState(false);
   const [selectedItemForAdjustment, setSelectedItemForAdjustment] = useState<StockItem | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  // Reset pagination when search or filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, selectedCategory, selectedCabang, filterLowStockOnly]);
 
   const filteredItems = useMemo(() => {
     return stockList.filter((item) => {
@@ -94,6 +102,12 @@ export function StockTable({
       return true;
     });
   }, [stockList, selectedCabang, selectedCategory, filterLowStockOnly, search]);
+
+  const totalPages = Math.ceil(filteredItems.length / pageSize) || 1;
+  const paginatedItems = filteredItems.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
   const lowStockCount = useMemo(() => {
     return stockList.filter((item) => isLowStock(item.jumlah, item.stok_minimum)).length;
@@ -225,7 +239,7 @@ export function StockTable({
                 </TableCell>
               </TableRow>
             ) : (
-              filteredItems.map((item) => {
+              paginatedItems.map((item) => {
                 const isWarning = isLowStock(item.jumlah, item.stok_minimum);
                 const canAdjust =
                   !!item.produk &&
@@ -314,6 +328,15 @@ export function StockTable({
             )}
           </TableBody>
         </Table>
+
+        <DataTablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          pageSize={pageSize}
+          totalItems={filteredItems.length}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={setPageSize}
+        />
       </div>
 
       {/* Stock Adjustment Modal */}

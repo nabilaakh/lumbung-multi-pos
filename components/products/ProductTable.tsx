@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Table,
   TableHeader,
@@ -26,6 +26,7 @@ import {
 import { ProductFormModal } from './ProductFormModal';
 import { CostPriceHistoryModal } from './CostPriceHistoryModal';
 import { LoadingState } from '@/components/ui/loading-state';
+import { DataTablePagination } from '@/components/ui/data-table-pagination';
 import {
   Search,
   Plus,
@@ -61,6 +62,14 @@ export function ProductTable({
   const [selectedProductForEdit, setSelectedProductForEdit] = useState<ProductWithCost | null>(null);
   const [selectedProductForCostHistory, setSelectedProductForCostHistory] = useState<ProductWithCost | null>(null);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  // Reset pagination when search or filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, selectedCategory, statusFilter]);
+
   const filteredProducts = useMemo(() => {
     return products.filter((prod) => {
       // Category filter
@@ -83,6 +92,12 @@ export function ProductTable({
       return true;
     });
   }, [products, selectedCategory, statusFilter, search]);
+
+  const totalPages = Math.ceil(filteredProducts.length / pageSize) || 1;
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
   const handleCreate = () => {
     setSelectedProductForEdit(null);
@@ -204,7 +219,7 @@ export function ProductTable({
                 </TableCell>
               </TableRow>
             ) : (
-              filteredProducts.map((prod) => (
+              paginatedProducts.map((prod) => (
                 <TableRow key={prod.id} className="border-b border-border/40 hover:bg-muted/30 transition-colors py-3 px-4 text-sm">
                   <TableCell className="py-3 px-4 font-mono font-medium text-foreground">
                     {prod.sku}
@@ -292,6 +307,15 @@ export function ProductTable({
             )}
           </TableBody>
         </Table>
+
+        <DataTablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          pageSize={pageSize}
+          totalItems={filteredProducts.length}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={setPageSize}
+        />
       </div>
 
       {/* Modals */}

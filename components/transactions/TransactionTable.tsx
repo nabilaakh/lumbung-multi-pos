@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { TransactionWithDetails } from '@/lib/services/transaction-service';
 import type { Cabang } from '@/types/database';
 import {
@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { DataTablePagination } from '@/components/ui/data-table-pagination';
 import { Search, Eye, Ban, Receipt, RefreshCw } from 'lucide-react';
 
 interface TransactionTableProps {
@@ -51,6 +52,13 @@ export function TransactionTable({
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'semua' | 'lunas' | 'void'>('semua');
   const [methodFilter, setMethodFilter] = useState<'semua' | 'tunai' | 'qris'>('semua');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  // Reset pagination when search or filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter, methodFilter, selectedBranchId]);
 
   const filtered = transactions.filter((trx) => {
     if (statusFilter !== 'semua' && trx.status !== statusFilter) return false;
@@ -65,6 +73,9 @@ export function TransactionTable({
 
     return true;
   });
+
+  const totalPages = Math.ceil(filtered.length / pageSize) || 1;
+  const paginatedData = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <div className="space-y-4">
@@ -169,7 +180,7 @@ export function TransactionTable({
                 </TableCell>
               </TableRow>
             ) : (
-              filtered.map((trx) => (
+              paginatedData.map((trx) => (
                 <TableRow key={trx.id} className="border-b border-border/40 hover:bg-muted/30 transition-colors py-3 px-4 text-sm">
                   <TableCell className="py-3 px-4 font-mono font-medium text-foreground">
                     {trx.nomor_struk}
@@ -238,6 +249,15 @@ export function TransactionTable({
             )}
           </TableBody>
         </Table>
+
+        <DataTablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          pageSize={pageSize}
+          totalItems={filtered.length}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={setPageSize}
+        />
       </div>
     </div>
   );

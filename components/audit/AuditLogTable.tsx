@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Table,
   TableHeader,
@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/select';
 import { AuditLogEntry } from '@/lib/services/settings-service';
 import { LoadingState } from '@/components/ui/loading-state';
+import { DataTablePagination } from '@/components/ui/data-table-pagination';
 import { Search, ShieldAlert, History, User, RefreshCw } from 'lucide-react';
 
 interface AuditLogTableProps {
@@ -32,6 +33,14 @@ interface AuditLogTableProps {
 export function AuditLogTable({ logs, onRefresh, loading = false }: AuditLogTableProps) {
   const [search, setSearch] = useState('');
   const [actionFilter, setActionFilter] = useState('all');
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  // Reset pagination when search or filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, actionFilter]);
 
   const filteredLogs = useMemo(() => {
     return logs.filter((l) => {
@@ -46,6 +55,12 @@ export function AuditLogTable({ logs, onRefresh, loading = false }: AuditLogTabl
       return true;
     });
   }, [logs, actionFilter, search]);
+
+  const totalPages = Math.ceil(filteredLogs.length / pageSize) || 1;
+  const paginatedLogs = filteredLogs.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
   const getActionBadge = (aksi: string) => {
     switch (aksi) {
@@ -186,7 +201,7 @@ export function AuditLogTable({ logs, onRefresh, loading = false }: AuditLogTabl
                 </TableCell>
               </TableRow>
             ) : (
-              filteredLogs.map((log) => (
+              paginatedLogs.map((log) => (
                 <TableRow key={log.id} className="border-b border-border/40 hover:bg-muted/30 transition-colors py-3 px-4 text-sm">
                   <TableCell className="font-mono text-xs text-muted-foreground whitespace-nowrap">
                     {new Date(log.dibuat_pada).toLocaleString('id-ID')}
@@ -248,6 +263,15 @@ export function AuditLogTable({ logs, onRefresh, loading = false }: AuditLogTabl
             )}
           </TableBody>
         </Table>
+
+        <DataTablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          pageSize={pageSize}
+          totalItems={filteredLogs.length}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={setPageSize}
+        />
       </div>
     </div>
   );
