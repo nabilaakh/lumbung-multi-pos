@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { ProductWithStock } from './ProductCatalog';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import {
   AlertCircle,
   ArrowRight,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export interface CartItem {
   product: ProductWithStock;
@@ -39,16 +40,63 @@ export function CartPanel({
   const [diskonInput, setDiskonInput] = useState<string>('0');
   const [alasanDiskon, setAlasanDiskon] = useState<string>('');
   const [discountError, setDiscountError] = useState<string | null>(null);
+  const [activePreset, setActivePreset] = useState<number | null>(null);
 
   const subtotal = cart.reduce(
     (sum, item) => sum + item.product.harga_jual * item.jumlah,
     0
   );
 
+  // Recalculate discount if active preset is active and subtotal changes
+  useEffect(() => {
+    if (cart.length === 0) {
+      setDiskonInput('0');
+      setAlasanDiskon('');
+      setActivePreset(null);
+      setDiscountError(null);
+      return;
+    }
+
+    if (activePreset === 5) {
+      setDiskonInput(String(Math.floor(subtotal * 0.05)));
+    } else if (activePreset === 10) {
+      setDiskonInput(String(Math.floor(subtotal * 0.10)));
+    } else if (activePreset === 0) {
+      setDiskonInput('0');
+    }
+  }, [subtotal, activePreset, cart.length]);
+
   const nominalDiskon = parseInt(diskonInput.replace(/\D/g, ''), 10) || 0;
   const maxDiskon = Math.floor(subtotal * 0.10);
   const isDiscountValid = nominalDiskon <= maxDiskon;
   const total = Math.max(0, subtotal - (isDiscountValid ? nominalDiskon : 0));
+
+  const handlePreset0 = () => {
+    setActivePreset(0);
+    setDiskonInput('0');
+    setAlasanDiskon('');
+    setDiscountError(null);
+  };
+
+  const handlePreset5 = () => {
+    setActivePreset(5);
+    const nominal = Math.floor(subtotal * 0.05);
+    setDiskonInput(String(nominal));
+    if (!alasanDiskon.trim() || alasanDiskon === 'Diskon Promo 10%') {
+      setAlasanDiskon('Diskon Promo 5%');
+    }
+    setDiscountError(null);
+  };
+
+  const handlePreset10 = () => {
+    setActivePreset(10);
+    const nominal = Math.floor(subtotal * 0.10);
+    setDiskonInput(String(nominal));
+    if (!alasanDiskon.trim() || alasanDiskon === 'Diskon Promo 5%') {
+      setAlasanDiskon('Diskon Promo 10%');
+    }
+    setDiscountError(null);
+  };
 
   const handleCheckoutClick = () => {
     setDiscountError(null);
@@ -68,12 +116,13 @@ export function CartPanel({
 
   const handleDiskonChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDiskonInput(e.target.value);
+    setActivePreset(null);
     setDiscountError(null);
   };
 
   return (
-    <Card className="flex flex-col h-full border shadow-md bg-card">
-      <CardHeader className="py-3.5 px-4 border-b flex flex-row items-center justify-between space-y-0">
+    <Card className="flex flex-col h-full border shadow-md bg-card overflow-hidden">
+      <CardHeader className="py-3 px-4 border-b flex flex-row items-center justify-between space-y-0 shrink-0">
         <div className="flex items-center gap-2">
           <ShoppingCart className="h-5 w-5 text-primary" />
           <CardTitle className="text-base font-bold">Keranjang Pesanan</CardTitle>
@@ -96,7 +145,7 @@ export function CartPanel({
       </CardHeader>
 
       {/* Daftar Item di Keranjang */}
-      <CardContent className="flex-1 overflow-y-auto p-4 space-y-3">
+      <CardContent className="flex-1 min-h-0 overflow-y-auto p-3.5 space-y-2.5">
         {cart.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-48 text-center text-muted-foreground text-sm">
             <ShoppingCart className="h-10 w-10 mb-2 opacity-25" />
@@ -168,16 +217,16 @@ export function CartPanel({
 
       {/* Bagian Perhitungan & Pembayaran */}
       {cart.length > 0 && (
-        <CardFooter className="flex-col p-4 border-t bg-muted/20 space-y-3">
+        <CardFooter className="flex-col p-3.5 border-t bg-muted/20 space-y-2.5 mt-auto shrink-0">
           {discountError && (
-            <div className="w-full flex items-center gap-2 p-2.5 rounded-lg bg-destructive/10 text-destructive text-xs border border-destructive/20">
+            <div className="w-full flex items-center gap-2 p-2 rounded-lg bg-destructive/10 text-destructive text-xs border border-destructive/20">
               <AlertCircle className="h-4 w-4 shrink-0" />
               <span>{discountError}</span>
             </div>
           )}
 
           {/* Form Diskon (BR-05) */}
-          <div className="w-full space-y-2 p-2.5 rounded-lg bg-card border text-xs">
+          <div className="w-full space-y-1.5 p-2 rounded-lg bg-card border text-xs">
             <div className="flex items-center justify-between">
               <span className="font-semibold text-foreground flex items-center gap-1">
                 <Percent className="h-3.5 w-3.5 text-primary" />
@@ -186,6 +235,48 @@ export function CartPanel({
               <span className="text-muted-foreground text-[11px]">
                 Maks: Rp{maxDiskon.toLocaleString('id-ID')}
               </span>
+            </div>
+
+            {/* Quick Preset Buttons */}
+            <div className="flex items-center gap-1.5 pt-0.5">
+              <Button
+                type="button"
+                variant={activePreset === 0 || nominalDiskon === 0 ? "secondary" : "outline"}
+                size="sm"
+                onClick={handlePreset0}
+                className={cn(
+                  "h-6 px-2 text-[10px] rounded-md font-medium transition-colors",
+                  (activePreset === 0 || nominalDiskon === 0) && "bg-muted text-foreground border-border font-semibold"
+                )}
+              >
+                [0%] / Reset
+              </Button>
+              <Button
+                type="button"
+                variant={activePreset === 5 ? "secondary" : "outline"}
+                size="sm"
+                onClick={handlePreset5}
+                disabled={subtotal <= 0}
+                className={cn(
+                  "h-6 px-2 text-[10px] rounded-md font-medium transition-colors",
+                  activePreset === 5 && "border-primary text-primary font-semibold bg-primary/10"
+                )}
+              >
+                [5%]
+              </Button>
+              <Button
+                type="button"
+                variant={activePreset === 10 ? "secondary" : "outline"}
+                size="sm"
+                onClick={handlePreset10}
+                disabled={subtotal <= 0}
+                className={cn(
+                  "h-6 px-2 text-[10px] rounded-md font-medium transition-colors",
+                  activePreset === 10 && "border-primary text-primary font-semibold bg-primary/10"
+                )}
+              >
+                [10%]
+              </Button>
             </div>
 
             <div className="grid grid-cols-2 gap-2">
@@ -224,9 +315,9 @@ export function CartPanel({
                 <span>- Rp{nominalDiskon.toLocaleString('id-ID')}</span>
               </div>
             )}
-            <div className="flex justify-between items-center text-base font-extrabold text-foreground pt-1 border-t">
+            <div className="flex justify-between items-center text-sm font-extrabold text-foreground pt-1 border-t">
               <span>Total Tagihan</span>
-              <span className="text-xl text-primary">
+              <span className="text-lg text-primary font-mono">
                 Rp{total.toLocaleString('id-ID')}
               </span>
             </div>
@@ -236,10 +327,10 @@ export function CartPanel({
             type="button"
             onClick={handleCheckoutClick}
             disabled={cart.length === 0}
-            className="w-full h-12 text-base font-bold shadow-md bg-primary hover:bg-primary/90 text-primary-foreground"
+            className="w-full h-11 text-sm font-bold shadow-md bg-primary hover:bg-primary/90 text-primary-foreground"
           >
             <span>Lanjut Pembayaran</span>
-            <ArrowRight className="h-5 w-5 ml-2" />
+            <ArrowRight className="h-4 w-4 ml-2" />
           </Button>
         </CardFooter>
       )}

@@ -100,7 +100,7 @@ export function ProductCatalog({ products, onAddToCart }: ProductCatalogProps) {
             <p className="text-xs">Coba kata kunci pencarian atau kategori lain.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {filteredProducts.map((prod) => {
               const isOutOfStock = prod.lacak_stok && (prod.stok_tersedia ?? 0) <= 0;
 

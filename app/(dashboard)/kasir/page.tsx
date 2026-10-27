@@ -233,7 +233,7 @@ export default function KasirPOSPage() {
               <Clock className="h-8 w-8" />
             </div>
             <div>
-              <h2 className="text-xl font-bold font-serif text-foreground">
+              <h2 className="text-xl font-bold text-foreground">
                 Sesi Kasir Belum Dibuka (BR-02)
               </h2>
               <p className="text-sm text-muted-foreground max-w-md mt-1">
@@ -259,14 +259,14 @@ export default function KasirPOSPage() {
   const totalCart = Math.max(0, subtotalCart - currentDiskon);
 
   return (
-    <div className="h-[calc(100vh-140px)] flex flex-col lg:flex-row gap-5">
-      {/* Kolom Kiri: Katalog Produk (65% width di desktop/tablet) */}
-      <div className="flex-1 h-full overflow-hidden">
+    <div className="h-[calc(100vh-140px)] flex flex-col md:flex-row gap-4 lg:gap-5">
+      {/* Kolom Kiri: Katalog Produk (Katalog di kiri) */}
+      <div className="flex-1 min-w-0 h-full overflow-hidden">
         <ProductCatalog products={products} onAddToCart={handleAddToCart} />
       </div>
 
-      {/* Kolom Kanan: Panel Keranjang & Checkout (35% width di desktop/tablet) */}
-      <div className="w-full lg:w-[400px] xl:w-[440px] h-full shrink-0">
+      {/* Kolom Kanan: Panel Keranjang & Checkout (Aktif 2 kolom mulai md:) */}
+      <div className="w-full md:w-[340px] lg:w-[380px] xl:w-[420px] h-full shrink-0">
         <CartPanel
           cart={cart}
           onUpdateQuantity={handleUpdateQuantity}
