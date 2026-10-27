@@ -11,6 +11,7 @@ import {
   countPendingShiftTransactions,
 } from '@/lib/services/shift-service';
 import type { ShiftKasir } from '@/types/database';
+import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
@@ -88,6 +89,7 @@ export function CloseShiftModal({
     }
 
     setIsOpen(false);
+    toast.success("Shift kasir berhasil ditutup");
     onShiftClosed();
   };
 

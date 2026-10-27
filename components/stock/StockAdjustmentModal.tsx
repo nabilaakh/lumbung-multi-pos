@@ -20,6 +20,7 @@ import {
 } from '@/lib/services/stock-service';
 import { AlertTriangle, CheckCircle, PackageOpen, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface StockAdjustmentModalProps {
   isOpen: boolean;
@@ -158,14 +159,19 @@ export function StockAdjustmentModal({
       });
 
       if (!res.success) {
-        setError(res.message || 'Gagal menyesuaikan stok');
+        const msg = res.message || 'Gagal menyesuaikan stok';
+        setError(msg);
+        toast.error('Gagal menyesuaikan stok: ' + msg);
         return;
       }
 
+      toast.success('Stok cabang berhasil diperbarui');
       onSuccess();
       onClose();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Terjadi kesalahan sistem');
+      const msg = err instanceof Error ? err.message : 'Terjadi kesalahan sistem';
+      setError(msg);
+      toast.error('Gagal menyesuaikan stok: ' + msg);
     } finally {
       setLoading(false);
     }

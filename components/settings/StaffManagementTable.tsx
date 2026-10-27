@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Table,
   TableHeader,
@@ -33,10 +33,9 @@ import {
   Plus,
   KeyRound,
   AlertTriangle,
-  CheckCircle2,
-  X,
   ShieldCheck,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
@@ -77,30 +76,13 @@ export function StaffManagementTable({
   const [isUpdating, setIsUpdating] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
 
-  // Toast notification state
-  const [toast, setToast] = useState<{
-    message: string;
-    variant: 'success' | 'destructive';
-  } | null>(null);
-  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
   const showToast = (message: string, variant: 'success' | 'destructive' = 'success') => {
-    if (toastTimeoutRef.current) {
-      clearTimeout(toastTimeoutRef.current);
+    if (variant === 'destructive') {
+      toast.error(message);
+    } else {
+      toast.success(message);
     }
-    setToast({ message, variant });
-    toastTimeoutRef.current = setTimeout(() => {
-      setToast(null);
-    }, 4500);
   };
-
-  useEffect(() => {
-    return () => {
-      if (toastTimeoutRef.current) {
-        clearTimeout(toastTimeoutRef.current);
-      }
-    };
-  }, []);
 
   const filteredStaff = useMemo(() => {
     return staffList.filter((s) => {
@@ -198,32 +180,6 @@ export function StaffManagementTable({
 
   return (
     <div className="space-y-4">
-      {/* Toast Notification Banner */}
-      {toast && (
-        <div
-          className={`flex items-center justify-between gap-3 p-3.5 rounded-xl border shadow-sm transition-all text-xs font-medium ${
-            toast.variant === 'destructive'
-              ? 'bg-destructive/10 border-destructive/20 text-destructive'
-              : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-400'
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            {toast.variant === 'destructive' ? (
-              <AlertTriangle className="w-4 h-4 shrink-0" />
-            ) : (
-              <CheckCircle2 className="w-4 h-4 shrink-0" />
-            )}
-            <span>{toast.message}</span>
-          </div>
-          <button
-            onClick={() => setToast(null)}
-            className="text-muted-foreground hover:text-foreground p-0.5 rounded-md"
-          >
-            <X className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      )}
-
       {/* Search and Filters Container */}
       <div className="rounded-xl border border-border/60 bg-card p-3 shadow-xs flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
         <div className="relative flex-1 min-w-[200px] max-w-sm">

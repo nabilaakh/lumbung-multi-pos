@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
 import { AlertCircle, AlertTriangle, Ban, Loader2 } from 'lucide-react';
 
 interface VoidModalProps {
@@ -61,10 +62,13 @@ export function VoidModal({
     setIsLoading(false);
 
     if (!success || error) {
-      setErrorMessage(error || 'Gagal memproses pembatalan transaksi.');
+      const msg = error || 'Gagal memproses pembatalan transaksi.';
+      setErrorMessage(msg);
+      toast.error(msg);
       return;
     }
 
+    toast.success('Transaksi berhasil dibatalkan (Void) dan stok dikembalikan');
     setAlasanVoid('');
     onClose();
     onSuccessVoid();

@@ -19,6 +19,7 @@ import {
   updateProduct,
 } from '@/lib/services/product-service';
 import { Package, Lock, AlertTriangle, Loader2, CheckCircle2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ProductFormModalProps {
   isOpen: boolean;
@@ -109,7 +110,9 @@ export function ProductFormModal({
         );
 
         if (!res.success) {
-          setError(res.error || 'Gagal mengubah produk');
+          const msg = res.error || 'Gagal mengubah produk';
+          setError(msg);
+          toast.error(msg);
           return;
         }
       } else {
@@ -128,15 +131,20 @@ export function ProductFormModal({
         );
 
         if (!res.success) {
-          setError(res.error || 'Gagal menambahkan produk');
+          const msg = res.error || 'Gagal menambahkan produk';
+          setError(msg);
+          toast.error(msg);
           return;
         }
       }
 
+      toast.success(isEditing ? 'Produk berhasil diperbarui' : 'Produk baru berhasil ditambahkan');
       onSuccess();
       onClose();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Terjadi kesalahan sistem');
+      const msg = err instanceof Error ? err.message : 'Terjadi kesalahan sistem';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

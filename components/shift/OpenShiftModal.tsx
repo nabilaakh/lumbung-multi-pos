@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { openShift, validateOpeningCash } from '@/lib/services/shift-service';
+import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
@@ -55,6 +56,7 @@ export function OpenShiftModal({ cashierId, cabangId, onShiftOpened }: OpenShift
     }
 
     setIsOpen(false);
+    toast.success("Shift kasir berhasil dibuka. Selamat bertugas!");
     onShiftOpened();
   };
 

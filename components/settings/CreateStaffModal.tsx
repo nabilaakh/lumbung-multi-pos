@@ -29,13 +29,14 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface CreateStaffModalProps {
   isOpen: boolean;
   onClose: () => void;
   branches: Cabang[];
   onSuccess: () => void;
-  onShowToast: (message: string, variant?: 'success' | 'destructive') => void;
+  onShowToast?: (message: string, variant?: 'success' | 'destructive') => void;
 }
 
 export function CreateStaffModal({
@@ -113,7 +114,10 @@ export function CreateStaffModal({
         return;
       }
 
-      onShowToast(`Staf "${namaLengkap}" berhasil didaftarkan dan diaktifkan.`, 'success');
+      toast.success(`Staf "${namaLengkap}" berhasil didaftarkan dan diaktifkan.`);
+      if (onShowToast) {
+        onShowToast(`Staf "${namaLengkap}" berhasil didaftarkan dan diaktifkan.`, 'success');
+      }
       resetForm();
       onClose();
       onSuccess();

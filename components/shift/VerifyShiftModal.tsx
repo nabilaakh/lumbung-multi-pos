@@ -18,6 +18,7 @@ import {
   isHighCashVariance,
   formatVarianceDisplay,
 } from '@/lib/services/stock-service';
+import { toast } from 'sonner';
 import {
   ShieldCheck,
   AlertTriangle,
@@ -89,6 +90,7 @@ export function VerifyShiftModal({
       }
 
       onSuccess();
+      toast.success("Rekonsiliasi kas shift berhasil diverifikasi");
       onClose();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Terjadi kesalahan sistem');

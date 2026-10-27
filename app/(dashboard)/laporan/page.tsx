@@ -47,6 +47,7 @@ import {
   exportTransactionsToCsv,
   exportShiftVariancesToCsv,
 } from '@/lib/utils/csv-export';
+import { toast } from 'sonner';
 
 export default function LaporanPage() {
   const supabase = createClient();
@@ -189,7 +190,7 @@ export default function LaporanPage() {
 
   const handleExportTransactions = () => {
     if (transactions.length === 0) {
-      alert('Tidak ada data transaksi yang dapat diekspor pada rentang filter ini.');
+      toast.warning('Tidak ada data transaksi yang dapat diekspor pada rentang filter ini.');
       return;
     }
     setIsExporting('transactions');
@@ -200,8 +201,10 @@ export default function LaporanPage() {
         endDate: endDate || undefined,
         datePreset,
       });
+      toast.success('Laporan transaksi penjualan berhasil diunduh.');
     } catch (err) {
       console.error('Failed to export transactions CSV:', err);
+      toast.error('Gagal mengekspor laporan transaksi.');
     } finally {
       setTimeout(() => setIsExporting(null), 600);
     }
@@ -209,7 +212,7 @@ export default function LaporanPage() {
 
   const handleExportShiftAudit = () => {
     if (shiftVariances.length === 0) {
-      alert('Tidak ada data audit kas shift yang dapat diekspor pada rentang filter ini.');
+      toast.warning('Tidak ada data audit kas shift yang dapat diekspor pada rentang filter ini.');
       return;
     }
     setIsExporting('shifts');
@@ -220,8 +223,10 @@ export default function LaporanPage() {
         endDate: endDate || undefined,
         datePreset,
       });
+      toast.success('Laporan audit kas shift berhasil diunduh.');
     } catch (err) {
       console.error('Failed to export shift variances CSV:', err);
+      toast.error('Gagal mengekspor laporan audit shift.');
     } finally {
       setTimeout(() => setIsExporting(null), 600);
     }

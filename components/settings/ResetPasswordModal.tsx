@@ -23,13 +23,14 @@ import {
   EyeOff,
   ShieldAlert,
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ResetPasswordModalProps {
   isOpen: boolean;
   onClose: () => void;
   staff: ProfilPengguna | null;
   onSuccess: () => void;
-  onShowToast: (message: string, variant?: 'success' | 'destructive') => void;
+  onShowToast?: (message: string, variant?: 'success' | 'destructive') => void;
 }
 
 export function ResetPasswordModal({
@@ -102,7 +103,10 @@ export function ResetPasswordModal({
         return;
       }
 
-      onShowToast(`Password untuk "${staff.nama_lengkap}" berhasil diperbarui.`, 'success');
+      toast.success(`Password untuk "${staff.nama_lengkap}" berhasil diperbarui.`);
+      if (onShowToast) {
+        onShowToast(`Password untuk "${staff.nama_lengkap}" berhasil diperbarui.`, 'success');
+      }
       onClose();
       onSuccess();
     } catch (err: unknown) {
