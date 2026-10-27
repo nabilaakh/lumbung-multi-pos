@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import {
   getReportDashboardData,
@@ -10,6 +10,7 @@ import {
   DailySalesItem,
   ShiftVarianceAuditItem,
   ProfitMetrics,
+  ReportTransactionRecord,
 } from '@/lib/services/report-service';
 import { Cabang } from '@/types/database';
 import { KpiSummaryCards } from '@/components/reports/KpiSummaryCards';
@@ -28,12 +29,24 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
-  BarChart,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
   Building2,
   Calendar,
   RefreshCw,
   FileSpreadsheet,
+  Download,
+  FileText,
+  ChevronDown,
 } from 'lucide-react';
+import {
+  exportTransactionsToCsv,
+  exportShiftVariancesToCsv,
+} from '@/lib/utils/csv-export';
 
 export default function LaporanPage() {
   const supabase = createClient();
@@ -66,8 +79,10 @@ export default function LaporanPage() {
   const [dailyTrend, setDailyTrend] = useState<DailySalesItem[]>([]);
   const [shiftVariances, setShiftVariances] = useState<ShiftVarianceAuditItem[]>([]);
   const [profitMetrics, setProfitMetrics] = useState<ProfitMetrics | null>(null);
+  const [transactions, setTransactions] = useState<ReportTransactionRecord[]>([]);
 
   const [isLoading, setIsLoading] = useState(true);
+  const [isExporting, setIsExporting] = useState<string | null>(null);
 
   // Set date preset helper
   const handleDatePreset = (preset: 'today' | '7days' | '30days' | 'all') => {
@@ -137,6 +152,7 @@ export default function LaporanPage() {
       setDailyTrend(data.dailyTrend);
       setShiftVariances(data.shiftVariances);
       setProfitMetrics(data.profitMetrics);
+      setTransactions(data.transactions || []);
     } catch (err) {
       console.error('Error loading report dashboard:', err);
     } finally {
@@ -155,6 +171,61 @@ export default function LaporanPage() {
   const userRole = profile?.peran || 'kasir';
   const isOwner = userRole === 'owner';
   const branchName = branches.find((b) => b.id === profile?.cabang_id)?.nama || 'Cabang Saya';
+
+  // Branch map for quick lookup
+  const branchMap = useMemo(() => {
+    const map = new Map<string, { kode: string; nama: string }>();
+    branches.forEach((b) => map.set(b.id, { kode: b.kode, nama: b.nama }));
+    return map;
+  }, [branches]);
+
+  const activeBranchName =
+    selectedBranch === 'all'
+      ? 'Semua Cabang'
+      : branches.find((b) => b.id === selectedBranch)?.nama || 'Cabang';
+
+  const effectiveExportBranchName =
+    profile?.peran === 'kepala_toko' ? branchName : activeBranchName;
+
+  const handleExportTransactions = () => {
+    if (transactions.length === 0) {
+      alert('Tidak ada data transaksi yang dapat diekspor pada rentang filter ini.');
+      return;
+    }
+    setIsExporting('transactions');
+    try {
+      exportTransactionsToCsv(transactions, branchMap, {
+        branchName: effectiveExportBranchName,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+        datePreset,
+      });
+    } catch (err) {
+      console.error('Failed to export transactions CSV:', err);
+    } finally {
+      setTimeout(() => setIsExporting(null), 600);
+    }
+  };
+
+  const handleExportShiftAudit = () => {
+    if (shiftVariances.length === 0) {
+      alert('Tidak ada data audit kas shift yang dapat diekspor pada rentang filter ini.');
+      return;
+    }
+    setIsExporting('shifts');
+    try {
+      exportShiftVariancesToCsv(shiftVariances, {
+        branchName: effectiveExportBranchName,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+        datePreset,
+      });
+    } catch (err) {
+      console.error('Failed to export shift variances CSV:', err);
+    } finally {
+      setTimeout(() => setIsExporting(null), 600);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -246,7 +317,7 @@ export default function LaporanPage() {
           </div>
         </div>
 
-        {/* Custom date range inputs and Refresh button */}
+        {/* Custom date range inputs, Refresh, and Export button */}
         <div className="flex items-center gap-2 flex-wrap">
           <div className="flex items-center gap-1.5">
             <Calendar className="w-4 h-4 text-muted-foreground" />
@@ -280,6 +351,51 @@ export default function LaporanPage() {
             <RefreshCw className={`w-4 h-4 mr-1.5 ${isLoading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
+
+          {/* Export Dropdown Button */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                disabled={isLoading || isExporting !== null}
+                className="h-10 px-3.5 text-sm rounded-xl border-border/80 bg-background hover:bg-muted font-medium gap-1.5"
+              >
+                {isExporting ? (
+                  <RefreshCw className="w-4 h-4 animate-spin text-primary" />
+                ) : (
+                  <Download className="w-4 h-4 text-primary" />
+                )}
+                <span>{isExporting ? 'Mengekspor...' : 'Ekspor CSV'}</span>
+                <ChevronDown className="w-3.5 h-3.5 opacity-60 ml-0.5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem
+                onClick={handleExportTransactions}
+                className="cursor-pointer gap-2 text-xs py-2"
+              >
+                <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <div className="flex flex-col">
+                  <span className="font-semibold text-foreground">Transaksi Penjualan</span>
+                  <span className="text-[10px] text-muted-foreground">
+                    {transactions.length} baris data
+                  </span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={handleExportShiftAudit}
+                className="cursor-pointer gap-2 text-xs py-2"
+              >
+                <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <div className="flex flex-col">
+                  <span className="font-semibold text-foreground">Audit Kas Shift (BR-10)</span>
+                  <span className="text-[10px] text-muted-foreground">
+                    {shiftVariances.length} baris data
+                  </span>
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 

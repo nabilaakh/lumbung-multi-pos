@@ -272,6 +272,7 @@ export async function getReportDashboardData(options: {
   dailyTrend: DailySalesItem[];
   shiftVariances: ShiftVarianceAuditItem[];
   profitMetrics: ProfitMetrics | null;
+  transactions: ReportTransactionRecord[];
 }> {
   const supabase = createClient();
   const { cabangId, startDate, endDate, userRole } = options;
@@ -388,5 +389,6 @@ export async function getReportDashboardData(options: {
     dailyTrend,
     shiftVariances,
     profitMetrics,
+    transactions: trxList,
   };
 }
