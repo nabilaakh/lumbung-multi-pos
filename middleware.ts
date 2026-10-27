@@ -71,9 +71,8 @@ export async function middleware(request: NextRequest) {
   if (isProtectedPath && profile) {
     const isAllowed = isRouteAllowedForRole(profile.peran, pathname);
     if (!isAllowed) {
-      // Pengguna mencoba membuka halaman di luar hak aksesnya -> redirect ke home peran
-      const homeRoute = getHomeRouteForRole(profile.peran);
-      return NextResponse.redirect(new URL(homeRoute, request.url));
+      // Pengguna mencoba membuka halaman di luar hak aksesnya -> redirect ke /unauthorized (403)
+      return NextResponse.redirect(new URL('/unauthorized', request.url));
     }
   }
 

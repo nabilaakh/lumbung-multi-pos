@@ -13,9 +13,9 @@ describe('Task 3: Auth Validation & Role-Based Navigation (BR-01 & Bab 7)', () =
       expect(destination).toBe('/kasir');
     });
 
-    it('should redirect kepala_toko to /transaksi by default', () => {
+    it('should redirect kepala_toko to /shift-cabang by default', () => {
       const destination = getHomeRouteForRole('kepala_toko');
-      expect(destination).toBe('/transaksi');
+      expect(destination).toBe('/shift-cabang');
     });
 
     it('should redirect owner to /laporan by default', () => {
@@ -60,14 +60,14 @@ describe('Task 3: Auth Validation & Role-Based Navigation (BR-01 & Bab 7)', () =
     });
   });
 
-  describe('Role-Based Route Protection Matrix (Bab 7)', () => {
-    it('should configure Kasir access: Kasir, Shift Saya, Transaksi (miliknya)', () => {
+  describe('Role-Based Route Protection Matrix (Bab 7 & RBAC)', () => {
+    it('should configure Kasir access: Diizinkan (/kasir, /shift-saya) & Ditolak (/transaksi, /stok, /shift-cabang, /produk, /laporan, /pengaturan)', () => {
       // Allowed
       expect(isRouteAllowedForRole('kasir', '/kasir')).toBe(true);
       expect(isRouteAllowedForRole('kasir', '/shift-saya')).toBe(true);
-      expect(isRouteAllowedForRole('kasir', '/transaksi')).toBe(true);
 
-      // Forbidden
+      // Forbidden (redirect ke /unauthorized)
+      expect(isRouteAllowedForRole('kasir', '/transaksi')).toBe(false);
       expect(isRouteAllowedForRole('kasir', '/stok')).toBe(false);
       expect(isRouteAllowedForRole('kasir', '/shift-cabang')).toBe(false);
       expect(isRouteAllowedForRole('kasir', '/produk')).toBe(false);
@@ -75,32 +75,30 @@ describe('Task 3: Auth Validation & Role-Based Navigation (BR-01 & Bab 7)', () =
       expect(isRouteAllowedForRole('kasir', '/pengaturan')).toBe(false);
     });
 
-    it('should configure Kepala Toko access: Transaksi, Stok Cabang, Shift Cabang, Produk, Laporan', () => {
+    it('should configure Kepala Toko access: Diizinkan (/shift-cabang, /transaksi, /stok, /produk, /laporan, /shift-saya) & Ditolak (/pengaturan, /kasir)', () => {
       // Allowed
+      expect(isRouteAllowedForRole('kepala_toko', '/shift-cabang')).toBe(true);
       expect(isRouteAllowedForRole('kepala_toko', '/transaksi')).toBe(true);
       expect(isRouteAllowedForRole('kepala_toko', '/stok')).toBe(true);
-      expect(isRouteAllowedForRole('kepala_toko', '/shift-cabang')).toBe(true);
       expect(isRouteAllowedForRole('kepala_toko', '/produk')).toBe(true);
       expect(isRouteAllowedForRole('kepala_toko', '/laporan')).toBe(true);
+      expect(isRouteAllowedForRole('kepala_toko', '/shift-saya')).toBe(true);
 
-      // Forbidden
-      expect(isRouteAllowedForRole('kepala_toko', '/kasir')).toBe(false);
-      expect(isRouteAllowedForRole('kepala_toko', '/shift-saya')).toBe(false);
+      // Forbidden (redirect ke /unauthorized)
       expect(isRouteAllowedForRole('kepala_toko', '/pengaturan')).toBe(false);
+      expect(isRouteAllowedForRole('kepala_toko', '/kasir')).toBe(false);
     });
 
-    it('should configure Owner access: Transaksi, Stok Cabang, Shift Cabang, Produk, Laporan, Pengaturan', () => {
-      // Allowed
+    it('should configure Owner access: Diizinkan ke semua rute dashboard', () => {
+      // Allowed ke semua rute dashboard
+      expect(isRouteAllowedForRole('owner', '/kasir')).toBe(true);
+      expect(isRouteAllowedForRole('owner', '/shift-saya')).toBe(true);
       expect(isRouteAllowedForRole('owner', '/transaksi')).toBe(true);
       expect(isRouteAllowedForRole('owner', '/stok')).toBe(true);
       expect(isRouteAllowedForRole('owner', '/shift-cabang')).toBe(true);
       expect(isRouteAllowedForRole('owner', '/produk')).toBe(true);
       expect(isRouteAllowedForRole('owner', '/laporan')).toBe(true);
       expect(isRouteAllowedForRole('owner', '/pengaturan')).toBe(true);
-
-      // Forbidden (POS kasir & shift kasir hanya untuk peran Kasir)
-      expect(isRouteAllowedForRole('owner', '/kasir')).toBe(false);
-      expect(isRouteAllowedForRole('owner', '/shift-saya')).toBe(false);
     });
   });
 });

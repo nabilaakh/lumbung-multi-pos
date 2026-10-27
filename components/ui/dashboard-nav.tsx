@@ -19,19 +19,19 @@ const ALL_NAV_ITEMS = [
     title: "Kasir",
     href: "/kasir",
     icon: ShoppingCart,
-    roles: ["kasir"],
+    roles: ["kasir", "owner"],
   },
   {
     title: "Shift Saya",
     href: "/shift-saya",
     icon: Clock,
-    roles: ["kasir"],
+    roles: ["kasir", "kepala_toko", "owner"],
   },
   {
     title: "Transaksi",
     href: "/transaksi",
     icon: Receipt,
-    roles: ["kasir", "kepala_toko", "owner"],
+    roles: ["kepala_toko", "owner"],
   },
   {
     title: "Stok Cabang",

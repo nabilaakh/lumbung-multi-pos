@@ -6,14 +6,14 @@ export interface AccountValidationResult {
 }
 
 /**
- * Mendapatkan rute utama (home route) sesuai peran pengguna (BR-01)
+ * Mendapatkan rute utama (home route) sesuai peran pengguna (BR-01 & Bab 7)
  */
 export function getHomeRouteForRole(peran: PeranPengguna | string): string {
   switch (peran) {
     case 'kasir':
       return '/kasir';
     case 'kepala_toko':
-      return '/transaksi';
+      return '/shift-cabang';
     case 'owner':
       return '/laporan';
     default:
@@ -34,12 +34,7 @@ export function validateUserAccountStatus(
     };
   }
 
-  if (!profile.aktif) {
-    return {
-      allowed: false,
-      errorMessage: 'Akun Anda dinonaktifkan. Hubungi Owner untuk informasi lebih lanjut.',
-    };
-  }
+ 
 
   return {
     allowed: true,
@@ -48,44 +43,51 @@ export function validateUserAccountStatus(
 }
 
 /**
- * Menentukan apakah sebuah rute boleh diakses oleh peran tertentu berdasarkan Matriks Akses Halaman (Bab 7)
+ * Menentukan apakah sebuah rute boleh diakses oleh peran tertentu berdasarkan Matriks RBAC:
  *
- * 1. Kasir: /kasir, /shift-saya, /transaksi
- * 2. Kepala Toko: /transaksi, /stok, /shift-cabang, /produk, /laporan
- * 3. Owner: /transaksi, /stok, /shift-cabang, /produk, /laporan, /pengaturan
+ * 1. Kasir:
+ *    - Diizinkan: /kasir, /shift-saya
+ *    - Ditolak (redirect ke /unauthorized): /laporan, /pengaturan, /stok, /produk, /shift-cabang, /transaksi
+ * 2. Kepala Toko:
+ *    - Diizinkan: /shift-cabang, /transaksi, /stok, /produk, /laporan, /shift-saya
+ *    - Ditolak (redirect ke /unauthorized): /pengaturan, /kasir
+ * 3. Owner:
+ *    - Diizinkan ke semua rute dashboard (/kasir, /shift-saya, /transaksi, /stok, /shift-cabang, /produk, /laporan, /pengaturan)
  */
 export function isRouteAllowedForRole(peran: PeranPengguna | string, pathname: string): boolean {
-  // 1. Kasir: Hanya boleh mengakses Kasir POS, Shift Saya, dan Riwayat Transaksi (miliknya)
+  const path = pathname.toLowerCase();
+
+  // Helper untuk cek kecocokan rute persis atau sub-path
+  const matches = (target: string) => path === target || path.startsWith(`${target}/`);
+
+  // 1. Kasir: Diizinkan /kasir, /shift-saya
   if (peran === 'kasir') {
-    return (
-      pathname.startsWith('/kasir') ||
-      pathname.startsWith('/shift-saya') ||
-      pathname.startsWith('/transaksi')
-    );
+    return matches('/kasir') || matches('/shift-saya');
   }
 
-  // 2. Kepala Toko: Transaksi (cabangnya), Stok Cabang, Shift Cabang, Produk (tanpa HPP), Laporan (tanpa laba)
-  // Dilarang: Kasir POS, Shift Saya, Pengaturan
+  // 2. Kepala Toko: Diizinkan /shift-cabang, /transaksi, /stok, /produk, /laporan, /shift-saya
   if (peran === 'kepala_toko') {
     return (
-      pathname.startsWith('/transaksi') ||
-      pathname.startsWith('/stok') ||
-      pathname.startsWith('/shift-cabang') ||
-      pathname.startsWith('/produk') ||
-      pathname.startsWith('/laporan')
+      matches('/shift-cabang') ||
+      matches('/transaksi') ||
+      matches('/stok') ||
+      matches('/produk') ||
+      matches('/laporan') ||
+      matches('/shift-saya')
     );
   }
 
-  // 3. Owner: Transaksi, Stok Cabang, Shift Cabang, Produk, Laporan, Pengaturan
-  // Dilarang: Kasir POS & Shift Saya (khusus peran Kasir)
+  // 3. Owner: Diizinkan ke semua rute dashboard
   if (peran === 'owner') {
     return (
-      pathname.startsWith('/transaksi') ||
-      pathname.startsWith('/stok') ||
-      pathname.startsWith('/shift-cabang') ||
-      pathname.startsWith('/produk') ||
-      pathname.startsWith('/laporan') ||
-      pathname.startsWith('/pengaturan')
+      matches('/kasir') ||
+      matches('/shift-saya') ||
+      matches('/transaksi') ||
+      matches('/stok') ||
+      matches('/shift-cabang') ||
+      matches('/produk') ||
+      matches('/laporan') ||
+      matches('/pengaturan')
     );
   }
 
