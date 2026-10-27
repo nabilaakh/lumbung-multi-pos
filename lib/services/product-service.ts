@@ -22,7 +22,6 @@ export interface ProductWithCost {
   lacak_stok: boolean;
   dibuat_pada: string;
   diubah_pada: string;
-  stok_minimum?: number;
   harga_modal_terakhir?: number;
   riwayat_harga_modal?: CostHistoryEntry[];
 }

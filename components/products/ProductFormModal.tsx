@@ -61,7 +61,7 @@ export function ProductFormModal({
       setHargaModal(product.harga_modal_terakhir || 0);
       setAktif(product.aktif);
       setLacakStok(product.lacak_stok);
-      setStokMinimum(product.stok_minimum ?? 10);
+      setStokMinimum(10);
     } else {
       setSku('');
       setNama('');

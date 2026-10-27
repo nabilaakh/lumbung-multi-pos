@@ -181,7 +181,6 @@ export function ProductTable({
                   </span>
                 </TableHead>
               )}
-              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-right">Batas Min</TableHead>
               <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-center">Status</TableHead>
               {isOwner && (
                 <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-right">Aksi</TableHead>
@@ -191,14 +190,14 @@ export function ProductTable({
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={isOwner ? 8 : 6} className="p-0">
+                <TableCell colSpan={isOwner ? 7 : 5} className="p-0">
                   <LoadingState label="Memuat katalog produk..." />
                 </TableCell>
               </TableRow>
             ) : filteredProducts.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={isOwner ? 8 : 6}
+                  colSpan={isOwner ? 7 : 5}
                   className="text-center py-12 text-sm text-muted-foreground"
                 >
                   Tidak ada produk yang sesuai dengan filter.
@@ -249,9 +248,6 @@ export function ProductTable({
                     </TableCell>
                   )}
 
-                  <TableCell className="py-3 px-4 text-right font-mono text-sm text-muted-foreground">
-                    {prod.stok_minimum}
-                  </TableCell>
                   <TableCell className="py-3 px-4 text-center">
                     {prod.aktif ? (
                       <Badge variant="success" className="font-medium text-xs px-2.5 py-0.5 rounded-full">
