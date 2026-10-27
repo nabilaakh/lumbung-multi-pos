@@ -25,7 +25,7 @@ export function getHomeRouteForRole(peran: PeranPengguna | string): string {
  * Memvalidasi apakah status akun aktif untuk dapat mengakses sistem (BR-01)
  */
 export function validateUserAccountStatus(
-  profile: ProfilPengguna | null | undefined
+  profile: (ProfilPengguna & { is_active?: boolean }) | null | undefined
 ): AccountValidationResult {
   if (!profile) {
     return {
@@ -34,7 +34,12 @@ export function validateUserAccountStatus(
     };
   }
 
- 
+  if (profile.aktif === false || profile.is_active === false) {
+    return {
+      allowed: false,
+      errorMessage: 'Akun Anda telah dinonaktifkan. Hubungi Owner untuk informasi lebih lanjut.',
+    };
+  }
 
   return {
     allowed: true,
