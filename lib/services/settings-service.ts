@@ -1,5 +1,9 @@
 import { createClient } from '@/lib/supabase/client';
 import { ProfilPengguna, Cabang, PeranPengguna } from '@/types/database';
+import {
+  toggleStaffStatusAction,
+  updateStaffRoleAndBranchAction,
+} from '@/lib/actions/staff-actions';
 
 export interface AuditLogEntry {
   id: string;
@@ -50,32 +54,14 @@ export async function updateStaffStatus(
   profileId: string,
   aktif: boolean
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient();
-  const { error } = await supabase
-    .from('profiles')
-    .update({ aktif })
-    .eq('id', profileId);
-
-  if (error) {
-    return { success: false, error: error.message };
-  }
-  return { success: true };
+  return toggleStaffStatusAction(profileId, aktif);
 }
 
 export async function updateStaffRoleAndBranch(
   profileId: string,
-  params: { peran?: PeranPengguna; cabang_id?: string | null }
+  params: { peran: PeranPengguna; cabang_id?: string | null }
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient();
-  const { error } = await supabase
-    .from('profiles')
-    .update(params)
-    .eq('id', profileId);
-
-  if (error) {
-    return { success: false, error: error.message };
-  }
-  return { success: true };
+  return updateStaffRoleAndBranchAction(profileId, params);
 }
 
 export async function getBranches(): Promise<Cabang[]> {

@@ -669,7 +669,19 @@ export type KategoriProduk = 'kopi' | 'non_kopi' | 'roti' | 'snack' | 'kemasan';
 export type StatusShift = 'buka' | 'ditutup' | 'diverifikasi';
 export type StatusTransaksi = 'lunas' | 'void' | 'menunggu_bayar' | 'batal';
 export type MetodeBayar = 'tunai' | 'qris';
-export type AksiAudit = 'void_transaksi' | 'verifikasi_shift' | 'penyesuaian_stok' | 'ubah_harga_jual' | 'ubah_harga_modal' | 'nonaktifkan_produk' | 'ubah_akun' | 'nonaktifkan_akun';
+export type AksiAudit =
+  | 'void_transaksi'
+  | 'verifikasi_shift'
+  | 'penyesuaian_stok'
+  | 'ubah_harga_jual'
+  | 'ubah_harga_modal'
+  | 'nonaktifkan_produk'
+  | 'ubah_akun'
+  | 'nonaktifkan_akun'
+  | 'batal_transaksi_qris'
+  | 'tambah_staf'
+  | 'aktifkan_akun'
+  | 'reset_password';
 
 export type Cabang = Database['public']['Tables']['cabang']['Row'];
 export type Profile = Database['public']['Tables']['profiles']['Row'];

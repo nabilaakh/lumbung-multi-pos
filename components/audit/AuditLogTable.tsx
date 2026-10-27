@@ -67,6 +67,42 @@ export function AuditLogTable({ logs, onRefresh, loading = false }: AuditLogTabl
             Verifikasi Shift
           </Badge>
         );
+      case 'batal_transaksi_qris':
+        return (
+          <Badge variant="destructive" className="font-medium text-xs px-2.5 py-0.5 rounded-full">
+            Batal QRIS
+          </Badge>
+        );
+      case 'tambah_staf':
+        return (
+          <Badge variant="default" className="font-medium text-xs px-2.5 py-0.5 rounded-full">
+            Tambah Staf
+          </Badge>
+        );
+      case 'ubah_akun':
+        return (
+          <Badge variant="secondary" className="font-medium text-xs px-2.5 py-0.5 rounded-full">
+            Ubah Akun
+          </Badge>
+        );
+      case 'aktifkan_akun':
+        return (
+          <Badge variant="success" className="font-medium text-xs px-2.5 py-0.5 rounded-full">
+            Aktifkan Akun
+          </Badge>
+        );
+      case 'nonaktifkan_akun':
+        return (
+          <Badge variant="destructive" className="font-medium text-xs px-2.5 py-0.5 rounded-full">
+            Nonaktifkan Akun
+          </Badge>
+        );
+      case 'reset_password':
+        return (
+          <Badge variant="outline" className="font-medium text-xs px-2.5 py-0.5 rounded-full text-primary border-primary/30">
+            Reset Password
+          </Badge>
+        );
       default:
         return (
           <Badge variant="outline" className="font-medium text-xs px-2.5 py-0.5 rounded-full">
@@ -92,7 +128,7 @@ export function AuditLogTable({ logs, onRefresh, loading = false }: AuditLogTabl
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <div className="w-[200px]">
+          <div className="w-[220px]">
             <Select value={actionFilter} onValueChange={setActionFilter}>
               <SelectTrigger className="h-10 text-sm rounded-xl">
                 <SelectValue placeholder="Semua Aksi" />
@@ -102,6 +138,12 @@ export function AuditLogTable({ logs, onRefresh, loading = false }: AuditLogTabl
                 <SelectItem value="penyesuaian_stok">Penyesuaian Stok</SelectItem>
                 <SelectItem value="void_transaksi">Void Transaksi</SelectItem>
                 <SelectItem value="verifikasi_shift">Verifikasi Shift</SelectItem>
+                <SelectItem value="batal_transaksi_qris">Batal Transaksi QRIS</SelectItem>
+                <SelectItem value="tambah_staf">Tambah Staf</SelectItem>
+                <SelectItem value="ubah_akun">Ubah Akun Staf</SelectItem>
+                <SelectItem value="aktifkan_akun">Aktifkan Akun</SelectItem>
+                <SelectItem value="nonaktifkan_akun">Nonaktifkan Akun</SelectItem>
+                <SelectItem value="reset_password">Reset Password</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -161,27 +203,42 @@ export function AuditLogTable({ logs, onRefresh, loading = false }: AuditLogTabl
                   </TableCell>
                   <TableCell className="text-xs text-foreground">
                     <div className="space-y-1 font-mono text-[11px]">
-                      {log.nilai_sesudah && (
-                        <div className="bg-muted/50 p-2 rounded border border-border">
-                          {Boolean(log.nilai_sesudah.alasan) && (
+                      {(log.nilai_sesudah || log.nilai_sebelum) && (
+                        <div className="bg-muted/50 p-2 rounded border border-border space-y-1">
+                          {Boolean(log.nilai_sesudah?.alasan) && (
                             <div className="text-foreground font-sans font-semibold mb-1">
                               Alasan:{' '}
                               <span className="font-normal italic">
-                                &ldquo;{String(log.nilai_sesudah.alasan)}&rdquo;
+                                &ldquo;{String(log.nilai_sesudah?.alasan)}&rdquo;
                               </span>
                             </div>
                           )}
-                          {Boolean(log.nilai_sesudah.alasan_void) && (
+                          {Boolean(log.nilai_sesudah?.alasan_void) && (
                             <div className="text-rose-700 dark:text-rose-300 font-sans font-semibold mb-1">
                               Alasan Void:{' '}
                               <span className="font-normal italic">
-                                &ldquo;{String(log.nilai_sesudah.alasan_void)}&rdquo;
+                                &ldquo;{String(log.nilai_sesudah?.alasan_void)}&rdquo;
                               </span>
                             </div>
                           )}
-                          <div className="text-muted-foreground text-[10px]">
-                            State: {JSON.stringify(log.nilai_sesudah)}
-                          </div>
+                          {Boolean(log.nilai_sesudah?.keterangan) && (
+                            <div className="text-foreground font-sans font-semibold mb-1">
+                              Keterangan:{' '}
+                              <span className="font-normal italic">
+                                &ldquo;{String(log.nilai_sesudah?.keterangan)}&rdquo;
+                              </span>
+                            </div>
+                          )}
+                          {Boolean(log.nilai_sebelum) && (
+                            <div className="text-muted-foreground text-[10px]">
+                              Sebelum: {JSON.stringify(log.nilai_sebelum)}
+                            </div>
+                          )}
+                          {Boolean(log.nilai_sesudah) && (
+                            <div className="text-foreground/80 text-[10px]">
+                              Sesudah: {JSON.stringify(log.nilai_sesudah)}
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
