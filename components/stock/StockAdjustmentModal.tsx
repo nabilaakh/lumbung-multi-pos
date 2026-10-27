@@ -11,8 +11,15 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { StockItem, adjustBranchStock, validateStockAdjustment } from '@/lib/services/stock-service';
+import {
+  StockItem,
+  StockAdjustmentMode,
+  StockAdjustmentType,
+  adjustBranchStock,
+  validateStockAdjustment,
+} from '@/lib/services/stock-service';
 import { AlertTriangle, CheckCircle, PackageOpen, Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface StockAdjustmentModalProps {
   isOpen: boolean;
@@ -23,14 +30,6 @@ interface StockAdjustmentModalProps {
   userCabangId?: string | null;
 }
 
-const REASON_PRESETS = [
-  'Barang Masuk (Faktur Penerimaan)',
-  'Barang Rusak / Kadaluarsa',
-  'Penyesuaian Stock Opname Fisik',
-  'Pengembalian / Retur Supplier',
-  'Lainnya',
-];
-
 export function StockAdjustmentModal({
   isOpen,
   onClose,
@@ -39,24 +38,73 @@ export function StockAdjustmentModal({
   userRole,
   userCabangId,
 }: StockAdjustmentModalProps) {
-  const [jumlahBaru, setJumlahBaru] = useState<number>(0);
-  const [presetReason, setPresetReason] = useState<string>(REASON_PRESETS[0]);
-  const [keterangan, setKeterangan] = useState<string>('');
+  const [mode, setMode] = useState<StockAdjustmentMode>('tambah');
+  const [kuantitasInput, setKuantitasInput] = useState<string>('');
+  const [alasan, setAlasan] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (item) {
-      setJumlahBaru(item.jumlah);
-      setPresetReason(REASON_PRESETS[0]);
-      setKeterangan('');
+    if (item && isOpen) {
+      setMode('tambah');
+      setKuantitasInput('');
+      setAlasan('');
       setError(null);
     }
   }, [item, isOpen]);
 
   if (!item) return null;
 
-  const selisih = jumlahBaru - item.jumlah;
+  const stokSaatIni = item.jumlah;
+  const parsedKuantitas = kuantitasInput.trim() === '' ? NaN : parseInt(kuantitasInput, 10);
+  const kuantitas = isNaN(parsedKuantitas) ? 0 : parsedKuantitas;
+
+  let stokAkhir = stokSaatIni;
+  let isKuantitasValid = false;
+  let validationMessage: string | null = null;
+
+  if (mode === 'tambah') {
+    stokAkhir = stokSaatIni + kuantitas;
+    if (kuantitasInput.trim() === '' || isNaN(parsedKuantitas) || parsedKuantitas <= 0) {
+      isKuantitasValid = false;
+      if (kuantitasInput.trim() !== '') {
+        validationMessage = 'Kuantitas penyesuaian harus lebih dari 0.';
+      }
+    } else {
+      isKuantitasValid = true;
+    }
+  } else if (mode === 'kurang') {
+    stokAkhir = stokSaatIni - kuantitas;
+    if (kuantitasInput.trim() === '' || isNaN(parsedKuantitas) || parsedKuantitas <= 0) {
+      isKuantitasValid = false;
+      if (kuantitasInput.trim() !== '') {
+        validationMessage = 'Kuantitas penyesuaian harus lebih dari 0.';
+      }
+    } else if (parsedKuantitas > stokSaatIni) {
+      isKuantitasValid = false;
+      validationMessage = `Kuantitas tidak boleh melebihi stok saat ini (${stokSaatIni} unit).`;
+    } else {
+      isKuantitasValid = true;
+    }
+  } else if (mode === 'opname') {
+    stokAkhir = kuantitas;
+    if (kuantitasInput.trim() === '' || isNaN(parsedKuantitas) || parsedKuantitas < 0) {
+      isKuantitasValid = false;
+      if (kuantitasInput.trim() !== '') {
+        validationMessage = 'Jumlah fisik tidak boleh bernilai negatif.';
+      }
+    } else if (parsedKuantitas === stokSaatIni) {
+      isKuantitasValid = false;
+      validationMessage = 'Jumlah fisik hasil opname tidak boleh bernilai sama persis dengan stok saat ini.';
+    } else {
+      isKuantitasValid = true;
+    }
+  }
+
+  const trimmedAlasan = alasan.trim();
+  const charCount = trimmedAlasan.length;
+  const isAlasanValid = charCount >= 5;
+  const canSubmit = !loading && Boolean(item.produk) && isKuantitasValid && isAlasanValid && stokAkhir >= 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,13 +115,27 @@ export function StockAdjustmentModal({
       return;
     }
 
-    const fullReason =
-      presetReason === 'Lainnya'
-        ? keterangan.trim()
-        : `${presetReason}${keterangan.trim() ? ` - ${keterangan.trim()}` : ''}`;
+    if (!isKuantitasValid) {
+      setError(validationMessage || 'Kuantitas input tidak valid.');
+      return;
+    }
+
+    if (trimmedAlasan.length < 5) {
+      setError('Alasan penyesuaian stok wajib diisi minimal 5 karakter.');
+      return;
+    }
+
+    const typeLabel: StockAdjustmentType =
+      mode === 'tambah'
+        ? 'Barang Masuk'
+        : mode === 'kurang'
+        ? 'Barang Rusak'
+        : 'Stock Opname';
+
+    const fullReason = `[${typeLabel}] ${trimmedAlasan}`;
 
     const validation = validateStockAdjustment({
-      jumlahBaru,
+      jumlahBaru: stokAkhir,
       alasan: fullReason,
       userRole,
       userCabangId,
@@ -90,8 +152,9 @@ export function StockAdjustmentModal({
       const res = await adjustBranchStock({
         cabangId: item.cabang_id,
         produkId: item.produk_id,
-        jumlahBaru,
-        alasan: fullReason,
+        jumlahBaru: stokAkhir,
+        alasan: trimmedAlasan,
+        tipe: typeLabel,
       });
 
       if (!res.success) {
@@ -149,66 +212,172 @@ export function StockAdjustmentModal({
             )}
             <div className="flex justify-between text-xs text-muted-foreground pt-1">
               <span>Cabang: <strong className="text-foreground">{item.cabang?.nama || item.cabang_id}</strong></span>
-              <span>Stok Saat Ini: <strong className="text-foreground">{item.jumlah}</strong></span>
+              <span>Stok Saat Ini: <strong className="text-foreground">{stokSaatIni} unit</strong></span>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-foreground">Jumlah Stok Baru</label>
-            <div className="flex items-center gap-3">
-              <Input
-                type="number"
-                min="0"
-                value={jumlahBaru}
-                onChange={(e) => setJumlahBaru(parseInt(e.target.value) || 0)}
-                className="font-mono text-base font-bold text-center h-11"
-                required
-              />
-              <div className="text-xs font-semibold shrink-0">
-                {selisih > 0 ? (
-                  <span className="text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2.5 py-1.5 rounded-md border border-emerald-200 dark:border-emerald-900">
-                    +{selisih} unit
-                  </span>
-                ) : selisih < 0 ? (
-                  <span className="text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/30 px-2.5 py-1.5 rounded-md border border-rose-200 dark:border-rose-900">
-                    {selisih} unit
-                  </span>
-                ) : (
-                  <span className="text-muted-foreground bg-muted px-2.5 py-1.5 rounded-md border border-border">
-                    Tidak berubah
-                  </span>
+          {/* 3 Mode Toggle Buttons */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-foreground">Tipe Penyesuaian</label>
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setMode('tambah');
+                  setError(null);
+                }}
+                className={cn(
+                  'py-2 px-1.5 rounded-lg text-xs font-semibold border transition-all text-center',
+                  mode === 'tambah'
+                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm ring-2 ring-emerald-500/20'
+                    : 'bg-background text-muted-foreground border-border hover:bg-muted hover:text-foreground'
                 )}
-              </div>
+              >
+                Barang Masuk
+                <span className="block text-[10px] font-normal opacity-90">(+ Tambah)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setMode('kurang');
+                  setError(null);
+                }}
+                className={cn(
+                  'py-2 px-1.5 rounded-lg text-xs font-semibold border transition-all text-center',
+                  mode === 'kurang'
+                    ? 'bg-rose-600 text-white border-rose-600 shadow-sm ring-2 ring-rose-500/20'
+                    : 'bg-background text-muted-foreground border-border hover:bg-muted hover:text-foreground'
+                )}
+              >
+                Barang Rusak
+                <span className="block text-[10px] font-normal opacity-90">(- Kurangi)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setMode('opname');
+                  setError(null);
+                }}
+                className={cn(
+                  'py-2 px-1.5 rounded-lg text-xs font-semibold border transition-all text-center',
+                  mode === 'opname'
+                    ? 'bg-amber-600 text-white border-amber-600 shadow-sm ring-2 ring-amber-500/20'
+                    : 'bg-background text-muted-foreground border-border hover:bg-muted hover:text-foreground'
+                )}
+              >
+                Stock Opname
+                <span className="block text-[10px] font-normal opacity-90">(= Set Nilai)</span>
+              </button>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-foreground">Kategori Penyesuaian</label>
-            <select
-              value={presetReason}
-              onChange={(e) => setPresetReason(e.target.value)}
-              className="w-full h-10 px-3 rounded-md border border-border bg-card text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              {REASON_PRESETS.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="space-y-2">
+          {/* Dynamic Quantity Input */}
+          <div className="space-y-1.5">
             <label className="text-xs font-semibold text-foreground">
-              Keterangan Alasan {presetReason === 'Lainnya' ? '(Wajib)' : '(Opsional)'}
+              {mode === 'opname' ? 'Jumlah Fisik Hasil Opname' : 'Kuantitas Penyesuaian'}
             </label>
             <Input
-              type="text"
-              placeholder="Contoh: No. Faktur PO-2026-081 atau Kerusakan kemasan..."
-              value={keterangan}
-              onChange={(e) => setKeterangan(e.target.value)}
-              className="text-xs h-10"
-              required={presetReason === 'Lainnya'}
+              type="number"
+              min="0"
+              placeholder={mode === 'opname' ? `Contoh: ${stokSaatIni + 5}` : 'Contoh: 10'}
+              value={kuantitasInput}
+              onChange={(e) => {
+                setKuantitasInput(e.target.value);
+                setError(null);
+              }}
+              className="font-mono text-base font-bold text-center h-11"
+              required
             />
+            {validationMessage && (
+              <p className="text-[11px] text-destructive font-medium flex items-center gap-1 mt-1">
+                <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                <span>{validationMessage}</span>
+              </p>
+            )}
+          </div>
+
+          {/* Calculation Preview */}
+          <div className="bg-muted/40 p-3 rounded-lg border border-border flex items-center justify-between text-xs">
+            <span className="text-muted-foreground font-medium">Preview Kalkulasi:</span>
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-foreground">
+                Stok Akhir: <span className="font-mono">{stokSaatIni}</span> →{' '}
+                <span
+                  className={cn(
+                    'font-mono font-bold',
+                    isKuantitasValid ? 'text-primary' : 'text-muted-foreground'
+                  )}
+                >
+                  {isKuantitasValid ? stokAkhir : '-'} unit
+                </span>
+              </span>
+              {isKuantitasValid && (
+                mode === 'tambah' ? (
+                  <Badge
+                    variant="outline"
+                    className="bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-300 dark:border-emerald-800 font-mono text-[11px]"
+                  >
+                    +{kuantitas} unit
+                  </Badge>
+                ) : mode === 'kurang' ? (
+                  <Badge
+                    variant="outline"
+                    className="bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border-rose-300 dark:border-rose-800 font-mono text-[11px]"
+                  >
+                    -{kuantitas} unit
+                  </Badge>
+                ) : (
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      'font-mono text-[11px]',
+                      stokAkhir > stokSaatIni
+                        ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-300 dark:border-emerald-800'
+                        : 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border-rose-300 dark:border-rose-800'
+                    )}
+                  >
+                    {stokAkhir > stokSaatIni ? `+${stokAkhir - stokSaatIni}` : `${stokAkhir - stokSaatIni}`} unit
+                  </Badge>
+                )
+              )}
+            </div>
+          </div>
+
+          {/* Reason Textarea (Mandatory, min 5 chars, no fallback) */}
+          <div className="space-y-1.5">
+            <div className="flex justify-between items-center">
+              <label className="text-xs font-semibold text-foreground">
+                Alasan Penyesuaian (Wajib Diisi - Minimal 5 Karakter)
+              </label>
+              <span
+                className={cn(
+                  'text-[11px] font-mono',
+                  charCount >= 5
+                    ? 'text-emerald-600 dark:text-emerald-400 font-semibold'
+                    : 'text-muted-foreground'
+                )}
+              >
+                {charCount} / 5 karakter
+              </span>
+            </div>
+            <textarea
+              rows={3}
+              value={alasan}
+              onChange={(e) => {
+                setAlasan(e.target.value);
+                setError(null);
+              }}
+              placeholder="Ketik alasan spesifik penyesuaian stok di sini (wajib diisi)..."
+              className="w-full rounded-md border border-input bg-card px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+              required
+            />
+            {charCount > 0 && charCount < 5 && (
+              <p className="text-[11px] text-amber-600 dark:text-amber-400">
+                * Masukkan minimal {5 - charCount} karakter lagi agar tombol simpan aktif.
+              </p>
+            )}
           </div>
 
           <DialogFooter className="pt-2">
@@ -225,7 +394,7 @@ export function StockAdjustmentModal({
             <Button
               type="submit"
               size="sm"
-              disabled={loading || !item.produk || (selisih === 0 && jumlahBaru === item.jumlah)}
+              disabled={!canSubmit}
               className="text-xs gap-1.5"
             >
               {loading ? (
@@ -236,7 +405,7 @@ export function StockAdjustmentModal({
               ) : (
                 <>
                   <CheckCircle className="w-3.5 h-3.5" />
-                  Simpan Penyesuaian
+                  Simpan Penyesuaian Stok
                 </>
               )}
             </Button>

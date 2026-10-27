@@ -49,6 +49,42 @@ describe('Task 8: Stock and Shift Supervision Business Rules', () => {
       expect(result.error).toContain('Alasan penyesuaian stok wajib diisi');
     });
 
+    it('should reject adjustment if reason has less than 5 non-whitespace characters', () => {
+      const result = validateStockAdjustment({
+        jumlahBaru: 25,
+        alasan: 'abc ',
+        userRole: 'kepala_toko',
+        userCabangId: 'cabang-tbt',
+        targetCabangId: 'cabang-tbt',
+      });
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain('minimal 5 karakter');
+    });
+
+    it('should reject adjustment if reason has a tag but the core reason is less than 5 characters', () => {
+      const result = validateStockAdjustment({
+        jumlahBaru: 25,
+        alasan: '[Barang Masuk] abc',
+        userRole: 'kepala_toko',
+        userCabangId: 'cabang-tbt',
+        targetCabangId: 'cabang-tbt',
+      });
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain('minimal 5 karakter');
+    });
+
+    it('should accept adjustment if reason has a tag and core reason is at least 5 characters', () => {
+      const result = validateStockAdjustment({
+        jumlahBaru: 25,
+        alasan: '[Barang Masuk] Penerimaan barang supplier',
+        userRole: 'kepala_toko',
+        userCabangId: 'cabang-tbt',
+        targetCabangId: 'cabang-tbt',
+      });
+      expect(result.valid).toBe(true);
+      expect(result.error).toBeUndefined();
+    });
+
     it('should forbid cashier (kasir) from adjusting stock', () => {
       const result = validateStockAdjustment({
         jumlahBaru: 20,

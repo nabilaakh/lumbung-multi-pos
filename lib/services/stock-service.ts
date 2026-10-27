@@ -61,11 +61,22 @@ export interface ShiftSupervisionItem {
   };
 }
 
+export type StockAdjustmentMode = 'tambah' | 'kurang' | 'opname';
+
+export const STOCK_ADJUSTMENT_TYPE_LABELS = {
+  tambah: 'Barang Masuk',
+  kurang: 'Barang Rusak',
+  opname: 'Stock Opname',
+} as const;
+
+export type StockAdjustmentType = (typeof STOCK_ADJUSTMENT_TYPE_LABELS)[keyof typeof STOCK_ADJUSTMENT_TYPE_LABELS];
+
 export interface StockAdjustmentInput {
   cabangId: string;
   produkId: string;
   jumlahBaru: number;
   alasan: string;
+  tipe?: StockAdjustmentType | string;
 }
 
 export interface ShiftVerificationInput {
@@ -123,8 +134,11 @@ export function validateStockAdjustment(params: {
     return { valid: false, error: 'Jumlah stok baru tidak boleh negatif' };
   }
 
-  if (!alasan || alasan.trim().length === 0) {
-    return { valid: false, error: 'Alasan penyesuaian stok wajib diisi (BR-12)' };
+  const rawAlasan = alasan ? alasan.trim() : '';
+  const coreReason = rawAlasan.replace(/^\[[^\]]+\]\s*/, '').trim();
+
+  if (!rawAlasan || rawAlasan.length < 5 || (rawAlasan.startsWith('[') && coreReason.length < 5)) {
+    return { valid: false, error: 'Alasan penyesuaian stok wajib diisi minimal 5 karakter (BR-12)' };
   }
 
   if (userRole === 'kasir') {
@@ -215,13 +229,28 @@ export async function adjustBranchStock(input: StockAdjustmentInput): Promise<{
   jumlahBaru?: number;
   message?: string;
 }> {
+  const rawAlasan = input.alasan ? input.alasan.trim() : '';
+  const coreReason = rawAlasan.replace(/^\[[^\]]+\]\s*/, '').trim();
+
+  if (!rawAlasan || rawAlasan.length < 5 || (rawAlasan.startsWith('[') && coreReason.length < 5)) {
+    return {
+      success: false,
+      message: 'Alasan penyesuaian stok wajib diisi minimal 5 karakter',
+    };
+  }
+
+  let finalAlasan = rawAlasan;
+  if (input.tipe && !rawAlasan.startsWith(`[${input.tipe}]`)) {
+    finalAlasan = `[${input.tipe}] ${coreReason}`;
+  }
+
   const supabase = createClient();
 
   const { data, error } = await supabase.rpc('sesuaikan_stok_cabang', {
     p_cabang_id: input.cabangId,
     p_produk_id: input.produkId,
     p_jumlah_baru: input.jumlahBaru,
-    p_alasan: input.alasan.trim(),
+    p_alasan: finalAlasan.trim(),
   });
 
   if (error) {
