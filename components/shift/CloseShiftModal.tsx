@@ -172,7 +172,7 @@ export function CloseShiftModal({
                 id="uangFisik"
                 type="number"
                 min="0"
-                step="100"
+                step="any"
                 value={uangFisik}
                 onChange={(e) => {
                   setUangFisik(e.target.value);
