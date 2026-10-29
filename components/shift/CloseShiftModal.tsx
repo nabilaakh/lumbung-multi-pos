@@ -206,7 +206,7 @@ export function CloseShiftModal({
               <div className="space-y-2 p-3.5 rounded-xl bg-destructive/5 border border-destructive/20 animate-in fade-in">
                 <div className="flex items-center gap-2 text-destructive text-xs font-semibold">
                   <AlertTriangle className="h-4 w-4" />
-                  <span>Aturan BR-09: Selisih &gt; Rp20.000 Wajib Menjelaskan Alasan</span>
+                  <span>Selisih &gt; Rp20.000 Wajib Menjelaskan Alasan</span>
                 </div>
                 <textarea
                   id="catatanTutup"

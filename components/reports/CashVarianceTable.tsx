@@ -26,7 +26,7 @@ export function CashVarianceTable({ shiftVariances }: CashVarianceTableProps) {
         <div>
           <CardTitle className="text-sm font-bold text-foreground flex items-center gap-2">
             <ShieldAlert className="w-4 h-4 text-primary" />
-            Audit Rekonsiliasi & Selisih Kas Shift (BR-10)
+            Audit Rekonsiliasi & Selisih Kas Shift
           </CardTitle>
           <p className="text-[11px] text-muted-foreground mt-0.5">
             Shift kasir dengan selisih kas fisik vs sistem. Selisih di atas Rp 20.000 ditandai merah.

@@ -182,7 +182,7 @@ export function AuditLogTable({ logs, onRefresh, loading = false }: AuditLogTabl
             <TableRow className="bg-muted/40 border-b border-border/60 hover:bg-muted/40">
               <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Waktu Kejadian</TableHead>
               <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Pelaku</TableHead>
-              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Aksi Sistem (BR-12)</TableHead>
+              <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Aksi Sistem</TableHead>
               <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tabel Terkait</TableHead>
               <TableHead className="py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Perubahan / Alasan</TableHead>
             </TableRow>

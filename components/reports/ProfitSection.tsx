@@ -27,13 +27,13 @@ export function ProfitSection({ profitMetrics, userRole }: ProfitSectionProps) {
             </CardTitle>
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Kalkulasi profitabilitas bersih berdasarkan riwayat harga modal HPP (BR-11).
+            Kalkulasi profitabilitas bersih berdasarkan riwayat harga modal HPP.
           </p>
         </div>
 
         <Badge className="bg-primary/10 text-primary border-primary/20 text-xs gap-1 py-1 font-semibold">
           <Lock className="w-3 h-3 text-primary" />
-          Khusus Owner (BR-11)
+          Khusus Owner
         </Badge>
       </CardHeader>
 

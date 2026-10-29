@@ -68,7 +68,7 @@ export default function StokPage() {
             Manajemen Stok Cabang
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Pemantauan kuantitas fisik, batas ambang minimum stok (BR-09), dan audit penyesuaian stok (BR-12).
+            Pemantauan kuantitas fisik, batas ambang minimum stok, dan audit penyesuaian stok.
           </p>
         </div>
       </div>

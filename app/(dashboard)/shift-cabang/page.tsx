@@ -66,7 +66,7 @@ export default function ShiftCabangPage() {
             Supervisi Shift Kasir
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Verifikasi rekonsiliasi kas shift (BR-10), pemantauan selisih kas fisik vs sistem, dan persetujuan supervisor.
+            Verifikasi rekonsiliasi kas shift, pemantauan selisih kas fisik vs sistem, dan persetujuan supervisor.
           </p>
         </div>
       </div>

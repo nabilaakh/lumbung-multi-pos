@@ -125,7 +125,7 @@ export function VerifyShiftModal({
             )}
           </div>
           <p className="text-xs text-muted-foreground">
-            Pemeriksaan selisih kas fisik vs sistem sebelum disetujui (BR-10 & BR-12).
+            Pemeriksaan selisih kas fisik vs sistem sebelum disetujui.
           </p>
         </DialogHeader>
 
@@ -141,7 +141,7 @@ export function VerifyShiftModal({
           <div className="bg-rose-50 dark:bg-rose-950/25 border border-rose-200 dark:border-rose-900 text-rose-800 dark:text-rose-200 p-3 rounded-lg text-xs flex items-start gap-2.5">
             <AlertTriangle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
             <div>
-              <div className="font-bold">Selisih Kas Melebihi Toleransi (BR-10)</div>
+              <div className="font-bold">Selisih Kas Melebihi Toleransi</div>
               <div>
                 Selisih kas sebesar{' '}
                 <strong className="font-mono text-rose-900 dark:text-rose-100">

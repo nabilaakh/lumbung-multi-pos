@@ -19,7 +19,7 @@ BEGIN
     SELECT * INTO v_user FROM public.profiles WHERE id = auth.uid();
 
     IF v_user.peran = 'kasir' OR (v_user.peran = 'kepala_toko' AND v_user.cabang_id != p_cabang_id) THEN
-        RAISE EXCEPTION 'Tidak berwenang menyesuaikan stok cabang ini (BR-12)';
+        RAISE EXCEPTION 'Tidak berwenang menyesuaikan stok cabang ini';
     END IF;
 
     IF p_jumlah_baru IS NULL OR p_jumlah_baru < 0 THEN

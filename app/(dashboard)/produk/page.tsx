@@ -58,7 +58,7 @@ export default function ProdukPage() {
             Katalog Master Produk
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Struktur 5 kategori bisnis (kopi, non_kopi, roti, snack, kemasan) dan proteksi harga modal (BR-01 & BR-11).
+            Struktur 5 kategori bisnis (kopi, non_kopi, roti, snack, kemasan) dan proteksi harga modal.
           </p>
         </div>
       </div>

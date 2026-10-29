@@ -188,7 +188,7 @@ export function StockAdjustmentModal({
             </DialogTitle>
           </div>
           <p className="text-xs text-muted-foreground">
-            Aksi ini dicatat dalam Audit Log sistem secara permanen (BR-12).
+            Aksi ini dicatat dalam Audit Log sistem secara permanen.
           </p>
         </DialogHeader>
 

@@ -200,7 +200,7 @@ export function ProductFormModal({
 
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
-              <label className="font-semibold text-foreground">Kategori (BR-01)</label>
+              <label className="font-semibold text-foreground">Kategori </label>
               <select
                 value={kategori}
                 onChange={(e) => setKategori(e.target.value as ProductCategory)}
@@ -233,7 +233,7 @@ export function ProductFormModal({
               <div className="flex items-center justify-between">
                 <label className="font-bold text-foreground flex items-center gap-1.5 text-xs">
                   <Lock className="w-3.5 h-3.5 text-primary" />
-                  Harga Modal / HPP (Khusus Owner - BR-11)
+                  Harga Modal / HPP (Khusus Owner)
                 </label>
                 <Badge className="bg-primary/20 text-primary text-[10px]">Rahasia</Badge>
               </div>

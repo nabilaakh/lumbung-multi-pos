@@ -123,7 +123,7 @@ export function StockTable({
               <AlertTriangle className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-sm font-bold">Peringatan Stok Menipis (BR-09)</h4>
+              <h4 className="text-sm font-bold">Peringatan Stok Menipis</h4>
               <p className="text-xs text-amber-800 dark:text-amber-300">
                 Terdapat <strong>{lowStockCount} item</strong> dengan jumlah stok di bawah atau sama dengan batas minimum.
               </p>

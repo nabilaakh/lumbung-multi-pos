@@ -113,7 +113,7 @@ export function BranchShiftTable({
             <div className="flex items-center gap-2.5">
               <Clock className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0" />
               <div>
-                <div className="text-xs font-bold">Shift Menunggu Verifikasi (BR-10)</div>
+                <div className="text-xs font-bold">Shift Menunggu Verifikasi</div>
                 <div className="text-[11px] text-amber-800 dark:text-amber-300">
                   Ada <strong>{pendingVerificationCount} shift</strong> yang ditutup kasir dan menunggu persetujuan.
                 </div>

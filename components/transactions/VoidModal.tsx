@@ -83,7 +83,7 @@ export function VoidModal({
           </div>
           <DialogTitle className="text-xl">Batalkan Transaksi (Void)</DialogTitle>
           <DialogDescription>
-            Tindakan ini akan membatalkan nomor struk, mengembalikan stok produk ke cabang, dan mencatat audit log (BR-08, BR-12).
+            Tindakan ini akan membatalkan nomor struk, mengembalikan stok produk ke cabang, dan mencatat audit log.
           </DialogDescription>
         </DialogHeader>
 

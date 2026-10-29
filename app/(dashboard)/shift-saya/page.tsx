@@ -156,7 +156,7 @@ export default function ShiftSayaPage() {
             </div>
             <h3 className="text-lg font-semibold text-foreground">Tidak Ada Shift Aktif</h3>
             <p className="text-sm text-muted-foreground max-w-md mt-1 mb-6">
-              Anda belum membuka sesi kerja kasir hari ini. Anda harus membuka shift dan memasukkan modal kas awal sebelum dapat melayani transaksi di menu Kasir (BR-02).
+              Anda belum membuka sesi kerja kasir hari ini. Anda harus membuka shift dan memasukkan modal kas awal sebelum dapat melayani transaksi di menu Kasir.
             </p>
             {profile.cabang_id && (
               <OpenShiftModal

@@ -39,7 +39,7 @@ BEGIN
     WHERE id = p_shift_id AND kasir_id = v_kasir_id;
 
     IF v_shift_status IS NULL OR v_shift_status != 'buka' THEN
-        RAISE EXCEPTION 'Shift kasir tidak aktif atau sudah ditutup (BR-02)';
+        RAISE EXCEPTION 'Shift kasir tidak aktif atau sudah ditutup';
     END IF;
 
     -- Validasi 2: Kunci baris cabang untuk penomoran struk sekuensial (BR-04)
@@ -74,11 +74,11 @@ BEGIN
         WHERE id = (v_item->>'produk_id')::UUID;
 
         IF v_produk IS NULL OR v_produk.aktif = false THEN
-            RAISE EXCEPTION 'Produk tidak ditemukan atau berstatus nonaktif (BR-05)';
+            RAISE EXCEPTION 'Produk tidak ditemukan atau berstatus nonaktif';
         END IF;
 
         IF (v_item->>'jumlah')::INT < 1 OR (v_item->>'jumlah')::INT > 99 THEN
-            RAISE EXCEPTION 'Jumlah item harus antara 1 sampai 99 (BR-05)';
+            RAISE EXCEPTION 'Jumlah item harus antara 1 sampai 99';
         END IF;
 
         -- Jika produk dilacak stoknya (bukan minuman racikan)
@@ -89,7 +89,7 @@ BEGIN
             FOR UPDATE;
 
             IF v_stok_tersedia IS NULL OR v_stok_tersedia < (v_item->>'jumlah')::INT THEN
-                RAISE EXCEPTION 'Stok untuk produk "%" tidak mencukupi (sisa: %) (BR-03)', 
+                RAISE EXCEPTION 'Stok untuk produk "%" tidak mencukupi (sisa: %)', 
                     v_produk.nama, COALESCE(v_stok_tersedia, 0);
             END IF;
 
@@ -184,24 +184,24 @@ BEGIN
     END IF;
 
     IF v_user.peran = 'kasir' OR (v_user.peran = 'kepala_toko' AND v_user.cabang_id != v_trx.cabang_id) THEN
-        RAISE EXCEPTION 'Anda tidak memiliki hak otorisasi void transaksi ini (BR-08)';
+        RAISE EXCEPTION 'Anda tidak memiliki hak otorisasi void transaksi ini';
     END IF;
 
     IF v_trx.status != 'lunas' THEN
-        RAISE EXCEPTION 'Hanya transaksi berstatus lunas yang dapat di-void (BR-08)';
+        RAISE EXCEPTION 'Hanya transaksi berstatus lunas yang dapat di-void';
     END IF;
 
     IF (v_trx.dibuat_pada AT TIME ZONE 'Asia/Jakarta')::DATE != (NOW() AT TIME ZONE 'Asia/Jakarta')::DATE THEN
-        RAISE EXCEPTION 'Void hanya berlaku untuk transaksi pada hari ini (BR-08)';
+        RAISE EXCEPTION 'Void hanya berlaku untuk transaksi pada hari ini';
     END IF;
 
     SELECT * INTO v_shift FROM public.shift_kasir WHERE id = v_trx.shift_id;
     IF v_shift.status != 'buka' THEN
-        RAISE EXCEPTION 'Transaksi tidak dapat di-void karena shift kasir sudah ditutup (BR-08)';
+        RAISE EXCEPTION 'Transaksi tidak dapat di-void karena shift kasir sudah ditutup';
     END IF;
 
     IF length(trim(COALESCE(p_alasan_void, ''))) < 10 THEN
-        RAISE EXCEPTION 'Alasan void minimal 10 karakter (BR-08)';
+        RAISE EXCEPTION 'Alasan void minimal 10 karakter';
     END IF;
 
     -- Kembalikan stok produk yang dilacak
@@ -273,7 +273,7 @@ BEGIN
     SELECT * INTO v_user FROM public.profiles WHERE id = auth.uid();
 
     IF v_user.peran = 'kasir' OR (v_user.peran = 'kepala_toko' AND v_user.cabang_id != p_cabang_id) THEN
-        RAISE EXCEPTION 'Tidak berwenang menyesuaikan stok cabang ini (BR-12)';
+        RAISE EXCEPTION 'Tidak berwenang menyesuaikan stok cabang ini';
     END IF;
 
     IF p_jumlah_baru < 0 THEN
@@ -281,7 +281,7 @@ BEGIN
     END IF;
 
     IF length(trim(COALESCE(p_alasan, ''))) = 0 THEN
-        RAISE EXCEPTION 'Alasan penyesuaian stok wajib diisi (BR-12)';
+        RAISE EXCEPTION 'Alasan penyesuaian stok wajib diisi';
     END IF;
 
     SELECT jumlah INTO v_jumlah_lama 
@@ -330,11 +330,11 @@ BEGIN
     END IF;
 
     IF v_user.peran = 'kasir' OR (v_user.peran = 'kepala_toko' AND v_user.cabang_id != v_shift.cabang_id) THEN
-        RAISE EXCEPTION 'Tidak berwenang memverifikasi shift ini (BR-10)';
+        RAISE EXCEPTION 'Tidak berwenang memverifikasi shift ini';
     END IF;
 
     IF v_shift.status != 'ditutup' THEN
-        RAISE EXCEPTION 'Hanya shift berstatus ditutup yang dapat diverifikasi (BR-10)';
+        RAISE EXCEPTION 'Hanya shift berstatus ditutup yang dapat diverifikasi';
     END IF;
 
     UPDATE public.shift_kasir

@@ -393,7 +393,7 @@ export default function LaporanPage() {
               >
                 <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 <div className="flex flex-col">
-                  <span className="font-semibold text-foreground">Audit Kas Shift (BR-10)</span>
+                  <span className="font-semibold text-foreground">Audit Kas Shift</span>
                   <span className="text-[10px] text-muted-foreground">
                     {shiftVariances.length} baris data
                   </span>

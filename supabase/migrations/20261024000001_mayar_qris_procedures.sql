@@ -52,7 +52,7 @@ BEGIN
     WHERE id = p_shift_id;
 
     IF v_shift_status IS NULL OR v_shift_status != 'buka' THEN
-        RAISE EXCEPTION 'Shift kasir tidak aktif atau sudah ditutup (BR-02)';
+        RAISE EXCEPTION 'Shift kasir tidak aktif atau sudah ditutup';
     END IF;
 
     IF v_kasir_id IS NULL THEN
@@ -91,11 +91,11 @@ BEGIN
         WHERE id = (v_item->>'produk_id')::UUID;
 
         IF v_produk IS NULL OR v_produk.aktif = false THEN
-            RAISE EXCEPTION 'Produk tidak ditemukan atau berstatus nonaktif (BR-05)';
+            RAISE EXCEPTION 'Produk tidak ditemukan atau berstatus nonaktif';
         END IF;
 
         IF (v_item->>'jumlah')::INT < 1 OR (v_item->>'jumlah')::INT > 99 THEN
-            RAISE EXCEPTION 'Jumlah item harus antara 1 sampai 99 (BR-05)';
+            RAISE EXCEPTION 'Jumlah item harus antara 1 sampai 99';
         END IF;
 
         -- Jika produk dilacak stoknya (reservasi stok)
@@ -106,7 +106,7 @@ BEGIN
             FOR UPDATE;
 
             IF v_stok_tersedia IS NULL OR v_stok_tersedia < (v_item->>'jumlah')::INT THEN
-                RAISE EXCEPTION 'Stok untuk produk "%" tidak mencukupi (sisa: %) (BR-03)', 
+                RAISE EXCEPTION 'Stok untuk produk "%" tidak mencukupi (sisa: %)', 
                     v_produk.nama, COALESCE(v_stok_tersedia, 0);
             END IF;
 

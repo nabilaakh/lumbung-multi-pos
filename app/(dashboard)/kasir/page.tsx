@@ -234,7 +234,7 @@ export default function KasirPOSPage() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-foreground">
-                Sesi Kasir Belum Dibuka (BR-02)
+                Sesi Kasir Belum Dibuka
               </h2>
               <p className="text-sm text-muted-foreground max-w-md mt-1">
                 Sesuai aturan operasional toko, Anda harus membuka sesi shift kasir dan mencatat kas awal di laci sebelum dapat memproses transaksi penjualan.

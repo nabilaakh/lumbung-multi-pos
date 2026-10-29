@@ -138,15 +138,15 @@ export function validateStockAdjustment(params: {
   const coreReason = rawAlasan.replace(/^\[[^\]]+\]\s*/, '').trim();
 
   if (!rawAlasan || rawAlasan.length < 5 || (rawAlasan.startsWith('[') && coreReason.length < 5)) {
-    return { valid: false, error: 'Alasan penyesuaian stok wajib diisi minimal 5 karakter (BR-12)' };
+    return { valid: false, error: 'Alasan penyesuaian stok wajib diisi minimal 5 karakter' };
   }
 
   if (userRole === 'kasir') {
-    return { valid: false, error: 'Kasir tidak berwenang menyesuaikan stok cabang ini (BR-12)' };
+    return { valid: false, error: 'Kasir tidak berwenang menyesuaikan stok cabang ini' };
   }
 
   if (userRole === 'kepala_toko' && userCabangId !== targetCabangId) {
-    return { valid: false, error: 'Kepala toko hanya dapat mengatur stok cabangnya sendiri (BR-12)' };
+    return { valid: false, error: 'Kepala toko hanya dapat mengatur stok cabangnya sendiri' };
   }
 
   return { valid: true };
@@ -164,15 +164,15 @@ export function validateShiftVerification(params: {
   const { shiftStatus, userRole, userCabangId, shiftCabangId } = params;
 
   if (shiftStatus !== 'ditutup') {
-    return { valid: false, error: 'Hanya shift berstatus ditutup yang dapat diverifikasi (BR-10)' };
+    return { valid: false, error: 'Hanya shift berstatus ditutup yang dapat diverifikasi' };
   }
 
   if (userRole === 'kasir') {
-    return { valid: false, error: 'Kasir tidak berwenang memverifikasi shift ini (BR-10)' };
+    return { valid: false, error: 'Kasir tidak berwenang memverifikasi shift ini' };
   }
 
   if (userRole === 'kepala_toko' && userCabangId !== shiftCabangId) {
-    return { valid: false, error: 'Kepala toko hanya dapat memverifikasi shift di cabangnya (BR-10)' };
+    return { valid: false, error: 'Kepala toko hanya dapat memverifikasi shift di cabangnya' };
   }
 
   return { valid: true };

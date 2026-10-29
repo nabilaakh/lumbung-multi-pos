@@ -74,7 +74,7 @@ export default function PengaturanPage() {
             Pengaturan Sistem & Audit
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Kelola penempatan akun staf, konfigurasi cabang, dan riwayat audit perubahan sistem (BR-12).
+            Kelola penempatan akun staf, konfigurasi cabang, dan riwayat audit perubahan sistem.
           </p>
         </div>
       </div>
@@ -92,7 +92,7 @@ export default function PengaturanPage() {
           </TabsTrigger>
           <TabsTrigger value="audit" className="text-xs font-semibold gap-1.5">
             <History className="w-3.5 h-3.5" />
-            Audit Log Sistem (BR-12)
+            Audit Log Sistem
           </TabsTrigger>
         </TabsList>
 
