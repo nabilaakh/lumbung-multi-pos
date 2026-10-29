@@ -323,6 +323,18 @@ export async function updateStaffRoleAndBranchAction(
     return { success: false, error: updateError.message };
   }
 
+  // Sinkronkan ke auth.users (user_metadata) untuk konsistensi JWT token & RLS
+  const { error: authMetaError } = await admin.auth.admin.updateUserById(profileId, {
+    user_metadata: {
+      peran: params.peran,
+      cabang_id: params.cabang_id,
+    },
+  });
+
+  if (authMetaError) {
+    console.error('Peringatan: Gagal memperbarui user_metadata di auth.users:', authMetaError.message);
+  }
+
   // Catat ke audit_log (BR-12)
   await recordStaffAuditLog({
     pelaku_id: callerCheck.callerId,
