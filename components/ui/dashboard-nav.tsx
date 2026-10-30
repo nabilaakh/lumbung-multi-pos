@@ -19,13 +19,13 @@ const ALL_NAV_ITEMS = [
     title: "Kasir",
     href: "/kasir",
     icon: ShoppingCart,
-    roles: ["kasir", "owner"],
+    roles: ["kasir"],
   },
   {
     title: "Shift Saya",
     href: "/shift-saya",
     icon: Clock,
-    roles: ["kasir", "kepala_toko", "owner"],
+    roles: ["kasir"],
   },
   {
     title: "Transaksi",
@@ -87,16 +87,14 @@ export function DashboardNav({ role }: DashboardNavProps) {
           <Link
             key={item.href}
             href={item.href}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs md:text-sm font-medium transition-all ${
-              isActive
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs md:text-sm font-medium transition-all ${isActive
                 ? "bg-card text-foreground shadow-xs font-semibold border border-border/60"
                 : "text-muted-foreground hover:bg-card/60 hover:text-foreground"
-            }`}
+              }`}
           >
             <Icon
-              className={`h-4 w-4 ${
-                isActive ? "text-primary" : "text-muted-foreground"
-              }`}
+              className={`h-4 w-4 ${isActive ? "text-primary" : "text-muted-foreground"
+                }`}
             />
             <span>{item.title}</span>
           </Link>
